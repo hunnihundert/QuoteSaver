@@ -24,7 +24,7 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
         debug {
-            buildConfigField "String", "API_URL", "\"https://api.paperquotes.com/apiv1/quotes/\""
+            buildConfigField "String", "API_URL", "\"https://api.paperquotes.com/apiv1/\""
             buildConfigField "String", "API_KEY", "\"5de8e486a5f22042fa371d7af8a47c90cb0c2155\""
         }
     }
