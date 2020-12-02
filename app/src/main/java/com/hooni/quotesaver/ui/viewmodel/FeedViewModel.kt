@@ -5,11 +5,11 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.hooni.quotesaver.data.QuoteRepository
-import com.hooni.quotesaver.data.model.ApiResultPojo
+import com.hooni.quotesaver.data.model.ApiQuoteResult
 import com.hooni.quotesaver.data.model.Quote
 import kotlinx.coroutines.launch
 
-class FeedViewModel(private val quoteRepository: QuoteRepository): ViewModel() {
+class FeedViewModel(private val quoteRepository: QuoteRepository) : ViewModel() {
 
     companion object {
         private const val TAG = "FeedViewModel"
@@ -19,31 +19,37 @@ class FeedViewModel(private val quoteRepository: QuoteRepository): ViewModel() {
     val searchTerm = MutableLiveData("")
 
     fun loadRandomQuotes() {
-        quoteRepository.getRandomQuotes()
-    }
-
-    fun getQuote() {
         viewModelScope.launch {
-            val a = quoteRepository.getQuotes()
-            provideQuotesFromApiResponse(a)
+            setRandomCategory()
+            getQuotesByCategory()
         }
-
     }
 
-    private fun provideQuotesFromApiResponse(apiResponse: ApiResultPojo) {
+    private suspend fun setRandomCategory() {
+        val randomCategory = getTags().random()
+        searchTerm.value = randomCategory
+    }
+
+    fun getQuotesByCategory() {
+        if (isSearchTermEmpty()) {
+            // Inform user about search term being empty
+        } else {
+            viewModelScope.launch {
+                val apiResponse = quoteRepository.getQuotesByCategory(searchTerm.value!!)
+                provideQuotesFromApiResponse(apiResponse)
+            }
+        }
+    }
+
+    private suspend fun getTags(): List<String> {
+        val tags = quoteRepository.getTags().results
+        return tags.map {it.name}
+    }
+
+    private fun provideQuotesFromApiResponse(apiResponse: ApiQuoteResult) {
         val next = apiResponse.next
         val results = apiResponse.results
-
         quotes.value = results
-        Log.d(TAG, "provideQuotesFromApiResponse: ${quotes.value}")
-    }
-
-    fun searchForCategoryQuote() {
-        if(isSearchTermEmpty()) {
-            // search term is empty
-        } else {
-            quoteRepository.getQuotesFromCategory(searchTerm.value!!)
-        }
     }
 
     private fun isSearchTermEmpty(): Boolean {

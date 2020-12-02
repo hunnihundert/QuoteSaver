@@ -41,6 +41,7 @@ class FeedFragment: Fragment() {
         savedInstanceState: Bundle?
     ): View? {
         binding = FragmentFeedBinding.inflate(inflater,container,false)
+        binding.feedViewModel = feedViewModel
         binding.lifecycleOwner = viewLifecycleOwner
         return binding.root
     }
@@ -48,15 +49,14 @@ class FeedFragment: Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         initUi()
         initObserver()
-        initViewModel()
+        setRandomQuoteList()
     }
 
     private fun initUi() {
         searchTextInputLayout = binding.textInputLayoutFeedSearch
         searchButton = binding.buttonFeedSearch
         searchButton.setOnClickListener {
-            //feedViewModel.searchForCategoryQuote()
-            feedViewModel.getQuote()
+            feedViewModel.getQuotesByCategory()
         }
         initRecyclerView()
     }
@@ -70,14 +70,18 @@ class FeedFragment: Fragment() {
 
     private fun initObserver() {
         feedViewModel.quotes.observe(viewLifecycleOwner) { quoteList ->
-            Log.d(TAG, "initObserver: $quoteList")
             displayedQuotes.clear()
             displayedQuotes.addAll(quoteList)
             feedAdapter.notifyDataSetChanged()
+            moveEditTextCursorToEnd()
         }
     }
 
-    private fun initViewModel() {
+    private fun setRandomQuoteList() {
         feedViewModel.loadRandomQuotes()
+    }
+
+    private fun moveEditTextCursorToEnd() {
+        searchTextInputLayout.editText!!.setSelection(searchTextInputLayout.editText!!.length())
     }
 }
