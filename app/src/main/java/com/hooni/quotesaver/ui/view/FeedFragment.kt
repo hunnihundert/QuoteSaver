@@ -1,7 +1,6 @@
 package com.hooni.quotesaver.ui.view
 
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -16,7 +15,7 @@ import com.hooni.quotesaver.ui.adapter.QuoteFeedAdapter
 import com.hooni.quotesaver.ui.viewmodel.FeedViewModel
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
-class FeedFragment: Fragment() {
+class FeedFragment : Fragment() {
 
     companion object {
         private const val TAG = "FeedFragment"
@@ -29,6 +28,13 @@ class FeedFragment: Fragment() {
     private lateinit var searchButton: ImageButton
     private lateinit var feedRecyclerView: RecyclerView
     private lateinit var feedAdapter: QuoteFeedAdapter
+    private val endOfListDetector: RecyclerView.OnScrollListener =
+        object : RecyclerView.OnScrollListener() {
+            override fun onScrollStateChanged(recyclerView: RecyclerView, newState: Int) {
+                super.onScrollStateChanged(recyclerView, newState)
+                if (!feedRecyclerView.canScrollVertically(1) && newState == RecyclerView.SCROLL_STATE_IDLE) loadNewItems()
+            }
+        }
 
     private val displayedQuotes = mutableListOf<Quote>()
     private val likeStatusChanger: (Quote) -> Unit = { quote ->
@@ -39,8 +45,8 @@ class FeedFragment: Fragment() {
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
-        binding = FragmentFeedBinding.inflate(inflater,container,false)
+    ): View {
+        binding = FragmentFeedBinding.inflate(inflater, container, false)
         binding.feedViewModel = feedViewModel
         binding.lifecycleOwner = viewLifecycleOwner
         return binding.root
@@ -56,7 +62,7 @@ class FeedFragment: Fragment() {
         searchTextInputLayout = binding.textInputLayoutFeedSearch
         searchButton = binding.buttonFeedSearch
         searchButton.setOnClickListener {
-            feedViewModel.getQuotesByCategory()
+            feedViewModel.startNewRequest()
         }
         initRecyclerView()
     }
@@ -66,15 +72,29 @@ class FeedFragment: Fragment() {
         feedRecyclerView = binding.recyclerViewFeedQuoteFeed
         feedRecyclerView.layoutManager = LinearLayoutManager(requireContext())
         feedRecyclerView.adapter = feedAdapter
+        feedRecyclerView.addOnScrollListener(endOfListDetector)
+    }
+
+    private fun loadNewItems() {
+        feedViewModel.addNewItems()
     }
 
     private fun initObserver() {
         feedViewModel.quotes.observe(viewLifecycleOwner) { quoteList ->
-            displayedQuotes.clear()
-            displayedQuotes.addAll(quoteList)
-            feedAdapter.notifyDataSetChanged()
+            if(feedViewModel.isNewRequest()) resetRecyclerView()
+            updateRecyclerView(quoteList)
             moveEditTextCursorToEnd()
         }
+    }
+
+    private fun resetRecyclerView() {
+        feedRecyclerView.scrollToPosition(0)
+        displayedQuotes.clear()
+    }
+
+    private fun updateRecyclerView(quoteList: List<Quote>) {
+        displayedQuotes.addAll(quoteList)
+        feedAdapter.notifyDataSetChanged()
     }
 
     private fun setRandomQuoteList() {
