@@ -18,9 +18,9 @@ class QuoteFeedAdapter(private val quotes: List<Quote>,private val likeClickList
 
         fun bindView(quote: Quote, likeClickListener: (Quote) -> Unit) {
             binding.textViewListItemQuoteQuote.text = quote.quote
-//            binding.imageViewListItemQuoteShare.setOnClickListener {
-//                shareQuote(quote)
-//            }
+            binding.imageViewListItemQuoteShare.setOnClickListener {
+                shareQuote(quote)
+            }
 //            binding.imageViewListItemQuoteLiked.setOnClickListener {
 //                likeQuote(quote, likeClickListener)
 //            }
@@ -28,16 +28,16 @@ class QuoteFeedAdapter(private val quotes: List<Quote>,private val likeClickList
 //            else binding.imageViewListItemQuoteLiked.setImageResource(R.drawable.ic_favorite_border)
         }
 
-//        private fun shareQuote(quote: Quote) {
-//            val intentContent = Intent().apply {
-//                action = Intent.ACTION_SEND
-//                putExtra(Intent.EXTRA_TEXT, quote.quote)
-//                type = "text/plain"
-//            }
-//
-//            val shareIntent = Intent.createChooser(intentContent, "Share your Quote!")
-//            binding.root.context.startActivity(shareIntent)
-//        }
+        private fun shareQuote(quote: Quote) {
+            val intentContent = Intent().apply {
+                action = Intent.ACTION_SEND
+                putExtra(Intent.EXTRA_TEXT, quote.quote)
+                type = "text/plain"
+            }
+
+            val shareIntent = Intent.createChooser(intentContent, "Share your Quote!")
+            binding.root.context.startActivity(shareIntent)
+        }
 
 //        private fun likeQuote(quote: Quote, likeClickListener: (Quote) -> Unit) {
 //            likeClickListener(quote)
