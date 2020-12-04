@@ -1,6 +1,7 @@
 package com.hooni.quotesaver.core
 
 import android.app.Application
+import com.hooni.quotesaver.di.modules.localModule
 import com.hooni.quotesaver.di.modules.remoteModule
 import com.hooni.quotesaver.di.modules.repositoryModule
 import com.hooni.quotesaver.di.modules.viewModelModule
@@ -17,7 +18,8 @@ class BaseApplication : Application() {
             modules(
                 remoteModule,
                 repositoryModule,
-                viewModelModule
+                viewModelModule,
+                localModule
             )
         }
     }

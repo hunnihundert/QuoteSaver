@@ -31,8 +31,10 @@ class FeedFragment: Fragment() {
     private lateinit var feedAdapter: QuoteFeedAdapter
 
     private val displayedQuotes = mutableListOf<Quote>()
+    private val favoriteQuotes = mutableListOf<Quote>()
     private val likeStatusChanger: (Quote) -> Unit = { quote ->
-        //quote.liked = !quote.liked
+        if(favoriteQuotes.contains(quote)) feedViewModel.removeFromFavorites(quote)
+        else feedViewModel.addToFavorites(quote)
     }
 
     override fun onCreateView(
@@ -62,7 +64,7 @@ class FeedFragment: Fragment() {
     }
 
     private fun initRecyclerView() {
-        feedAdapter = QuoteFeedAdapter(displayedQuotes, likeStatusChanger)
+        feedAdapter = QuoteFeedAdapter(displayedQuotes, favoriteQuotes, likeStatusChanger)
         feedRecyclerView = binding.recyclerViewFeedQuoteFeed
         feedRecyclerView.layoutManager = LinearLayoutManager(requireContext())
         feedRecyclerView.adapter = feedAdapter
@@ -74,6 +76,11 @@ class FeedFragment: Fragment() {
             displayedQuotes.addAll(quoteList)
             feedAdapter.notifyDataSetChanged()
             moveEditTextCursorToEnd()
+        }
+        feedViewModel.favoriteQuotes.observe(viewLifecycleOwner) { favoriteQuotes ->
+            this.favoriteQuotes.clear()
+            this.favoriteQuotes.addAll(favoriteQuotes)
+            feedAdapter.notifyDataSetChanged()
         }
     }
 

@@ -1,10 +1,10 @@
 package com.hooni.quotesaver.ui.viewmodel
 
-import android.util.Log
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.asLiveData
 import androidx.lifecycle.viewModelScope
-import com.hooni.quotesaver.data.QuoteRepository
+import com.hooni.quotesaver.repository.QuoteRepository
 import com.hooni.quotesaver.data.model.ApiQuoteResult
 import com.hooni.quotesaver.data.model.Quote
 import kotlinx.coroutines.launch
@@ -16,6 +16,7 @@ class FeedViewModel(private val quoteRepository: QuoteRepository) : ViewModel() 
     }
 
     val quotes = MutableLiveData<List<Quote>>()
+    val favoriteQuotes = quoteRepository.getAllFavorites().asLiveData()
     val searchTerm = MutableLiveData("")
 
     fun loadRandomQuotes() {
@@ -54,6 +55,18 @@ class FeedViewModel(private val quoteRepository: QuoteRepository) : ViewModel() 
 
     private fun isSearchTermEmpty(): Boolean {
         return searchTerm.value.isNullOrBlank()
+    }
+
+    fun addToFavorites(quote: Quote) {
+        viewModelScope.launch {
+            quoteRepository.addToFavorites(quote)
+        }
+    }
+
+    fun removeFromFavorites(quote: Quote) {
+        viewModelScope.launch {
+            quoteRepository.removeFromFavorites(quote)
+        }
     }
 
 }

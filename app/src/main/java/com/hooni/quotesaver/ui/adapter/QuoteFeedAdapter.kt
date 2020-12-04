@@ -1,31 +1,28 @@
 package com.hooni.quotesaver.ui.adapter
 
-import android.content.Intent
 import android.view.LayoutInflater
-import android.view.View
 import android.view.ViewGroup
-import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.hooni.quotesaver.R
 import com.hooni.quotesaver.data.model.Quote
 import com.hooni.quotesaver.databinding.ListItemQuoteBinding
 
-class QuoteFeedAdapter(private val quotes: List<Quote>,private val likeClickListener: (Quote) -> Unit) :
+class QuoteFeedAdapter(private val quotes: List<Quote>, private val favoriteQuotes: List<Quote>, private val favoriteClickListener: (Quote) -> Unit) :
     RecyclerView.Adapter<QuoteFeedAdapter.QuoteViewHolder>() {
 
     class QuoteViewHolder(private val binding: ListItemQuoteBinding) :
         RecyclerView.ViewHolder(binding.root) {
 
-        fun bindView(quote: Quote, likeClickListener: (Quote) -> Unit) {
+        fun bindView(quote: Quote, favoriteClickListener: (Quote) -> Unit, favoriteQuotes: List<Quote>) {
             binding.textViewListItemQuoteQuote.text = quote.quote
 //            binding.imageViewListItemQuoteShare.setOnClickListener {
 //                shareQuote(quote)
 //            }
-//            binding.imageViewListItemQuoteLiked.setOnClickListener {
-//                likeQuote(quote, likeClickListener)
-//            }
-//            if (quote.liked) binding.imageViewListItemQuoteLiked.setImageResource(R.drawable.ic_favorite)
-//            else binding.imageViewListItemQuoteLiked.setImageResource(R.drawable.ic_favorite_border)
+            binding.imageViewListItemQuoteLiked.setOnClickListener {
+                addToFavorites(quote, favoriteClickListener, favoriteQuotes)
+            }
+            if (favoriteQuotes.contains(quote)) binding.imageViewListItemQuoteLiked.setImageResource(R.drawable.ic_favorite)
+            else binding.imageViewListItemQuoteLiked.setImageResource(R.drawable.ic_favorite_border)
         }
 
 //        private fun shareQuote(quote: Quote) {
@@ -39,11 +36,12 @@ class QuoteFeedAdapter(private val quotes: List<Quote>,private val likeClickList
 //            binding.root.context.startActivity(shareIntent)
 //        }
 
-//        private fun likeQuote(quote: Quote, likeClickListener: (Quote) -> Unit) {
-//            likeClickListener(quote)
-//            if (quote.liked) binding.imageViewListItemQuoteLiked.setImageResource(R.drawable.ic_favorite)
-//            else binding.imageViewListItemQuoteLiked.setImageResource(R.drawable.ic_favorite_border)
-//        }
+        private fun addToFavorites(quote: Quote, likeClickListener: (Quote) -> Unit, favoriteQuotes: List<Quote>) {
+            likeClickListener(quote)
+            if (favoriteQuotes.contains(quote)) binding.imageViewListItemQuoteLiked.setImageResource(R.drawable.ic_favorite)
+            else binding.imageViewListItemQuoteLiked.setImageResource(R.drawable.ic_favorite_border)
+        }
+
     }
 
 
@@ -55,7 +53,7 @@ class QuoteFeedAdapter(private val quotes: List<Quote>,private val likeClickList
 
     override fun onBindViewHolder(holder: QuoteViewHolder, position: Int) {
         val item = quotes[position]
-        holder.bindView(item, likeClickListener)
+        holder.bindView(item, favoriteClickListener, favoriteQuotes)
     }
 
     override fun getItemCount(): Int = quotes.size
