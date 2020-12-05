@@ -1,3 +1,4 @@
 package com.hooni.quotesaver.data.local
 
-interface LikedQuotesDao
+interface LikedQuotesDao {
+}

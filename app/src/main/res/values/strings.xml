@@ -1,6 +1,3 @@
 <resources>
     <string name="app_name">QuoteSaver</string>
-    <string name="contentDescription_imageView_listItemQuote_favorite">Add to Favorite</string>
-    <string name="contentDescription_imageView_listItemQuote_share">Share</string>
-    <string name="ContentDescription_imageButton_feed_search">Search</string>
 </resources>
