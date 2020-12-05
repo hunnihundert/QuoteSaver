@@ -35,7 +35,7 @@ class FeedViewModel(private val quoteRepository: QuoteRepository) : ViewModel() 
             // Inform user about search term being empty
         } else {
             viewModelScope.launch {
-                val apiResponse = quoteRepository.getQuotesByCategory(searchTerm.value!!)
+                val apiResponse = quoteRepository.getQuotesByCategory(searchTerm.value!!.trim())
                 provideQuotesFromApiResponse(apiResponse)
             }
         }
