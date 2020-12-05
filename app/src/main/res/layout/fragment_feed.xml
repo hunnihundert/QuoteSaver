@@ -45,7 +45,8 @@
                 android:layout_height="match_parent"
                 android:layout_weight="1"
                 android:background="@color/white"
-                android:src="@android:drawable/ic_menu_search" />
+                android:src="@android:drawable/ic_menu_search"
+                android:contentDescription="@string/ContentDescription_imageButton_feed_search" />
         </LinearLayout>
 
         <androidx.recyclerview.widget.RecyclerView

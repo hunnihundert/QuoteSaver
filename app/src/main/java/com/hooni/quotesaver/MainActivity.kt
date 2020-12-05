@@ -1,16 +1,8 @@
 package com.hooni.quotesaver
 
-import android.app.Application
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import com.hooni.quotesaver.di.modules.LocalModule
-import com.hooni.quotesaver.di.modules.remoteModule
-import com.hooni.quotesaver.di.modules.repositoryModule
-import com.hooni.quotesaver.di.modules.viewModelModule
+import androidx.appcompat.app.AppCompatActivity
 import com.hooni.quotesaver.ui.view.FeedFragment
-import org.koin.android.ext.koin.androidContext
-import org.koin.android.ext.koin.androidLogger
-import org.koin.core.context.startKoin
 
 class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {

@@ -2,6 +2,8 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.hooni.quotesaver">
 
+    <uses-permission android:name="android.permission.INTERNET" />
+
     <application
         android:name=".core.BaseApplication"
         android:allowBackup="true"
@@ -18,7 +20,5 @@
             </intent-filter>
         </activity>
     </application>
-
-    <uses-permission android:name="android.permission.INTERNET"/>
 
 </manifest>
