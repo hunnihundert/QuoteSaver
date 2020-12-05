@@ -6,7 +6,7 @@ import androidx.room.PrimaryKey
 @Entity
 data class Quote(
     val quote: String,
-    val author: String,
+    val author: String?,
     var likes: Int,
     val tags: List<String>,
     @PrimaryKey val pk: Int,

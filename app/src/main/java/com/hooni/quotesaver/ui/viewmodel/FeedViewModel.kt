@@ -1,5 +1,6 @@
 package com.hooni.quotesaver.ui.viewmodel
 
+import android.util.Log
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.asLiveData
@@ -19,7 +20,7 @@ class FeedViewModel(private val quoteRepository: QuoteRepository) : ViewModel() 
     val favoriteQuotes = quoteRepository.getAllFavorites().asLiveData()
     val searchTerm = MutableLiveData("")
 
-    fun loadRandomQuotes() {
+    internal fun loadRandomQuotes() {
         viewModelScope.launch {
             setRandomCategory()
             getQuotesByCategory()
@@ -31,7 +32,12 @@ class FeedViewModel(private val quoteRepository: QuoteRepository) : ViewModel() 
         searchTerm.value = randomCategory
     }
 
-    fun getQuotesByCategory() {
+    private suspend fun getTags(): List<String> {
+        val tags = quoteRepository.getTags().results
+        return tags.map {it.name}
+    }
+
+    internal fun getQuotesByCategory() {
         if (isSearchTermEmpty()) {
             // Inform user about search term being empty
         } else {
@@ -42,9 +48,8 @@ class FeedViewModel(private val quoteRepository: QuoteRepository) : ViewModel() 
         }
     }
 
-    private suspend fun getTags(): List<String> {
-        val tags = quoteRepository.getTags().results
-        return tags.map {it.name}
+    private fun isSearchTermEmpty(): Boolean {
+        return searchTerm.value.isNullOrBlank()
     }
 
     private fun provideQuotesFromApiResponse(apiResponse: ApiQuoteResult) {
@@ -53,19 +58,17 @@ class FeedViewModel(private val quoteRepository: QuoteRepository) : ViewModel() 
         quotes.value = results
     }
 
-    private fun isSearchTermEmpty(): Boolean {
-        return searchTerm.value.isNullOrBlank()
-    }
-
-    fun addToFavorites(quote: Quote) {
+    internal fun addToFavorites(quote: Quote) {
         viewModelScope.launch {
             quoteRepository.addToFavorites(quote)
+            Log.d(TAG, "addToFavorites: added to favorites: $quote")
         }
     }
 
-    fun removeFromFavorites(quote: Quote) {
+    internal fun removeFromFavorites(quote: Quote) {
         viewModelScope.launch {
             quoteRepository.removeFromFavorites(quote)
+            Log.d(TAG, "removeFromFavorites: removed from favorites: $quote")
         }
     }
 

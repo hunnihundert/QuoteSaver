@@ -1,5 +1,6 @@
 package com.hooni.quotesaver.ui.adapter
 
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
@@ -9,6 +10,10 @@ import com.hooni.quotesaver.databinding.ListItemQuoteBinding
 
 class QuoteFeedAdapter(private val quotes: List<Quote>, private val favoriteQuotes: List<Quote>, private val favoriteClickListener: (Quote) -> Unit) :
     RecyclerView.Adapter<QuoteFeedAdapter.QuoteViewHolder>() {
+
+    companion object {
+        private const val TAG = "QuoteFeedAdapter"
+    }
 
     class QuoteViewHolder(private val binding: ListItemQuoteBinding) :
         RecyclerView.ViewHolder(binding.root) {
@@ -21,6 +26,9 @@ class QuoteFeedAdapter(private val quotes: List<Quote>, private val favoriteQuot
             binding.imageViewListItemQuoteLiked.setOnClickListener {
                 addToFavorites(quote, favoriteClickListener, favoriteQuotes)
             }
+            Log.d(TAG, "bindView: $quote")
+            Log.d(TAG, "bindView: contains? ${favoriteQuotes.contains(quote)}")
+            Log.d(TAG, "bindView: favoriteQuotes: $favoriteQuotes")
             if (favoriteQuotes.contains(quote)) binding.imageViewListItemQuoteLiked.setImageResource(R.drawable.ic_favorite)
             else binding.imageViewListItemQuoteLiked.setImageResource(R.drawable.ic_favorite_border)
         }

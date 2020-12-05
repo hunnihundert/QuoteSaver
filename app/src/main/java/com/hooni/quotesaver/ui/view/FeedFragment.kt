@@ -32,7 +32,9 @@ class FeedFragment: Fragment() {
 
     private val displayedQuotes = mutableListOf<Quote>()
     private val favoriteQuotes = mutableListOf<Quote>()
-    private val likeStatusChanger: (Quote) -> Unit = { quote ->
+    private val favoriteStatusChanger: (Quote) -> Unit = { quote ->
+        Log.d(TAG, "likeClickListener: favoriteQuotes: $favoriteQuotes")
+        Log.d(TAG, "likeClickListener: contains? ${favoriteQuotes.contains(quote)}")
         if(favoriteQuotes.contains(quote)) feedViewModel.removeFromFavorites(quote)
         else feedViewModel.addToFavorites(quote)
     }
@@ -64,7 +66,7 @@ class FeedFragment: Fragment() {
     }
 
     private fun initRecyclerView() {
-        feedAdapter = QuoteFeedAdapter(displayedQuotes, favoriteQuotes, likeStatusChanger)
+        feedAdapter = QuoteFeedAdapter(displayedQuotes, favoriteQuotes, favoriteStatusChanger)
         feedRecyclerView = binding.recyclerViewFeedQuoteFeed
         feedRecyclerView.layoutManager = LinearLayoutManager(requireContext())
         feedRecyclerView.adapter = feedAdapter
@@ -72,23 +74,34 @@ class FeedFragment: Fragment() {
 
     private fun initObserver() {
         feedViewModel.quotes.observe(viewLifecycleOwner) { quoteList ->
-            displayedQuotes.clear()
-            displayedQuotes.addAll(quoteList)
-            feedAdapter.notifyDataSetChanged()
+            updateDisplayedQuotes(quoteList)
             moveEditTextCursorToEnd()
         }
-        feedViewModel.favoriteQuotes.observe(viewLifecycleOwner) { favoriteQuotes ->
-            this.favoriteQuotes.clear()
-            this.favoriteQuotes.addAll(favoriteQuotes)
-            feedAdapter.notifyDataSetChanged()
+        feedViewModel.favoriteQuotes.observe(viewLifecycleOwner) { favoriteQuoteList ->
+            updateFavoriteQuotes(favoriteQuoteList)
         }
+    }
+
+    private fun updateDisplayedQuotes(quoteList: List<Quote>) {
+        displayedQuotes.clear()
+        displayedQuotes.addAll(quoteList)
+        feedAdapter.notifyDataSetChanged()
+    }
+
+    private fun updateFavoriteQuotes(favoriteQuoteList: List<Quote>) {
+        favoriteQuotes.clear()
+        favoriteQuotes.addAll(favoriteQuoteList)
+        feedAdapter.notifyDataSetChanged()
+        Log.d(TAG, "updateFavoriteQuotes: $favoriteQuoteList")
+    }
+
+    private fun moveEditTextCursorToEnd() {
+        searchTextInputLayout.editText!!.setSelection(searchTextInputLayout.editText!!.length())
     }
 
     private fun setRandomQuoteList() {
         feedViewModel.loadRandomQuotes()
     }
 
-    private fun moveEditTextCursorToEnd() {
-        searchTextInputLayout.editText!!.setSelection(searchTextInputLayout.editText!!.length())
-    }
+
 }
