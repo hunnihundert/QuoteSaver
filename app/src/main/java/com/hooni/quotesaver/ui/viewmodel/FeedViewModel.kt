@@ -19,6 +19,7 @@ class FeedViewModel(private val quoteRepository: QuoteRepository) : ViewModel() 
     val quotes = MutableLiveData<List<Quote>>()
     val favoriteQuotes = quoteRepository.getAllFavorites().asLiveData()
     val searchTerm = MutableLiveData("")
+    var currentSearchTerm = ""
 
     internal fun loadRandomQuotes() {
         viewModelScope.launch {
@@ -29,6 +30,7 @@ class FeedViewModel(private val quoteRepository: QuoteRepository) : ViewModel() 
 
     private suspend fun setRandomCategory() {
         val randomCategory = getTags().random()
+        currentSearchTerm = randomCategory
         searchTerm.value = randomCategory
     }
 
@@ -42,6 +44,7 @@ class FeedViewModel(private val quoteRepository: QuoteRepository) : ViewModel() 
             // Inform user about search term being empty
         } else {
             viewModelScope.launch {
+                currentSearchTerm = searchTerm.value!!
                 val apiResponse = quoteRepository.getQuotesByCategory(searchTerm.value!!)
                 provideQuotesFromApiResponse(apiResponse)
             }
@@ -61,14 +64,12 @@ class FeedViewModel(private val quoteRepository: QuoteRepository) : ViewModel() 
     internal fun addToFavorites(quote: Quote) {
         viewModelScope.launch {
             quoteRepository.addToFavorites(quote)
-            Log.d(TAG, "addToFavorites: added to favorites: $quote")
         }
     }
 
     internal fun removeFromFavorites(quote: Quote) {
         viewModelScope.launch {
             quoteRepository.removeFromFavorites(quote)
-            Log.d(TAG, "removeFromFavorites: removed from favorites: $quote")
         }
     }
 

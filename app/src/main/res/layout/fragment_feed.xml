@@ -20,32 +20,32 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
+            android:padding="4dp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent">
 
-            <com.google.android.material.textfield.TextInputLayout
-                android:id="@+id/textInputLayout_feed_search"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="4"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent">
 
                 <com.google.android.material.textfield.TextInputEditText
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:text="@={feedViewModel.searchTerm}" />
-            </com.google.android.material.textfield.TextInputLayout>
-
-            <ImageButton
-                android:id="@+id/button_feed_search"
+                    android:id="@+id/editText_feed_search"
+                    android:layout_width="0dp"
+                    android:layout_height="40dp"
+                    android:layout_weight="8"
+                    android:background="@drawable/shape_edittext_rounded"
+                    android:drawableEnd="?android:attr/actionModeWebSearchDrawable"
+                    android:imeOptions="actionSearch"
+                    android:inputType="text"
+                    android:paddingHorizontal="12dp"
+                    android:hint="Search"
+                    android:text="@={feedViewModel.searchTerm}"
+                    tools:textColor="@color/black" />
+            <ImageView
+                android:id="@+id/imageView_feed_favorites"
                 android:layout_width="0dp"
-                android:layout_height="match_parent"
+                android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:background="@color/white"
-                android:src="@android:drawable/ic_menu_search" />
+                android:src="@drawable/ic_favorite"
+                android:layout_gravity="center"/>
         </LinearLayout>
 
         <androidx.recyclerview.widget.RecyclerView

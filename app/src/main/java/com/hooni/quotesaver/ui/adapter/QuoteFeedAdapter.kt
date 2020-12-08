@@ -26,9 +26,6 @@ class QuoteFeedAdapter(private val quotes: List<Quote>, private val favoriteQuot
             binding.imageViewListItemQuoteLiked.setOnClickListener {
                 addToFavorites(quote, favoriteClickListener, favoriteQuotes)
             }
-            Log.d(TAG, "bindView: $quote")
-            Log.d(TAG, "bindView: contains? ${favoriteQuotes.contains(quote)}")
-            Log.d(TAG, "bindView: favoriteQuotes: $favoriteQuotes")
             if (favoriteQuotes.contains(quote)) binding.imageViewListItemQuoteLiked.setImageResource(R.drawable.ic_favorite)
             else binding.imageViewListItemQuoteLiked.setImageResource(R.drawable.ic_favorite_border)
         }

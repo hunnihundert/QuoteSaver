@@ -7,6 +7,7 @@ import com.hooni.quotesaver.di.modules.repositoryModule
 import com.hooni.quotesaver.di.modules.viewModelModule
 import org.koin.android.ext.koin.androidContext
 import org.koin.android.ext.koin.androidLogger
+import org.koin.androidx.fragment.koin.fragmentFactory
 import org.koin.core.context.startKoin
 
 class BaseApplication : Application() {
@@ -15,6 +16,7 @@ class BaseApplication : Application() {
         startKoin {
             androidLogger()
             androidContext(this@BaseApplication)
+            fragmentFactory()
             modules(
                 remoteModule,
                 repositoryModule,
