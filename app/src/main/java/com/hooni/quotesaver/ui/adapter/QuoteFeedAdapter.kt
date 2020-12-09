@@ -1,6 +1,6 @@
 package com.hooni.quotesaver.ui.adapter
 
-import android.util.Log
+import android.content.Intent
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
@@ -20,26 +20,28 @@ class QuoteFeedAdapter(private val quotes: List<Quote>, private val favoriteQuot
 
         fun bindView(quote: Quote, favoriteClickListener: (Quote) -> Unit, favoriteQuotes: List<Quote>) {
             binding.textViewListItemQuoteQuote.text = quote.quote
-//            binding.imageViewListItemQuoteShare.setOnClickListener {
-//                shareQuote(quote)
-//            }
             binding.imageViewListItemQuoteLiked.setOnClickListener {
                 addToFavorites(quote, favoriteClickListener, favoriteQuotes)
             }
+            binding.imageViewListItemQuoteShare.setOnClickListener {
+                shareQuote(quote)
+            }
+
             if (favoriteQuotes.contains(quote)) binding.imageViewListItemQuoteLiked.setImageResource(R.drawable.ic_favorite)
             else binding.imageViewListItemQuoteLiked.setImageResource(R.drawable.ic_favorite_border)
+
         }
 
-//        private fun shareQuote(quote: Quote) {
-//            val intentContent = Intent().apply {
-//                action = Intent.ACTION_SEND
-//                putExtra(Intent.EXTRA_TEXT, quote.quote)
-//                type = "text/plain"
-//            }
-//
-//            val shareIntent = Intent.createChooser(intentContent, "Share your Quote!")
-//            binding.root.context.startActivity(shareIntent)
-//        }
+        private fun shareQuote(quote: Quote) {
+            val intentContent = Intent().apply {
+                action = Intent.ACTION_SEND
+                putExtra(Intent.EXTRA_TEXT, quote.quote)
+                type = "text/plain"
+            }
+
+            val shareIntent = Intent.createChooser(intentContent, "Share your Quote!")
+            binding.root.context.startActivity(shareIntent)
+        }
 
         private fun addToFavorites(quote: Quote, likeClickListener: (Quote) -> Unit, favoriteQuotes: List<Quote>) {
             likeClickListener(quote)
