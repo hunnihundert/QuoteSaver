@@ -2,8 +2,9 @@ package com.hooni.quotesaver.ui.viewmodel
 
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.asLiveData
 import androidx.lifecycle.viewModelScope
-import com.hooni.quotesaver.data.QuoteRepository
+import com.hooni.quotesaver.repository.QuoteRepository
 import com.hooni.quotesaver.data.model.ApiQuoteResult
 import com.hooni.quotesaver.data.model.Quote
 import com.hooni.quotesaver.util.NUMBER_OF_QUOTES_RETURNED_AT_ONCE
@@ -16,7 +17,9 @@ class FeedViewModel(private val quoteRepository: QuoteRepository) : ViewModel() 
     }
 
     val quotes = MutableLiveData<List<Quote>>()
+    val favoriteQuotes = quoteRepository.getAllFavorites().asLiveData()
     val searchTerm = MutableLiveData("")
+    var currentSearchTerm = ""
 
     // in case of the user having typed in a new search term but hasn't tapped the search button
     // Scrolling to the bottom triggers a new request, which is based on lastRequestSearch
@@ -34,6 +37,7 @@ class FeedViewModel(private val quoteRepository: QuoteRepository) : ViewModel() 
 
     private suspend fun setRandomCategory() {
         val randomCategory = getTags().random()
+        currentSearchTerm = randomCategory
         searchTerm.value = randomCategory
         lastRequestedSearch = randomCategory
     }
@@ -43,11 +47,14 @@ class FeedViewModel(private val quoteRepository: QuoteRepository) : ViewModel() 
         return tags.map { it.name }
     }
 
-    private fun getQuotesByCategory() {
+    internal fun getQuotesByCategory() {
         if (isSearchTermEmpty()) {
             // Inform user about search term being empty
         } else {
             viewModelScope.launch {
+                currentSearchTerm = searchTerm.value!!
+                val apiResponse = quoteRepository.getQuotesByCategory(searchTerm.value!!)
+                setQuotesFromApiResponse(apiResponse)
                 nextItems.value?.let {
                     val offset = getOffset(nextItems.value)
                     val apiResponse =
@@ -66,6 +73,18 @@ class FeedViewModel(private val quoteRepository: QuoteRepository) : ViewModel() 
     private fun getOffset(url: String?): Int {
         return if(url.isNullOrBlank()) -1
         else url.substringAfter("offset=").substringBeforeLast("&tags").toInt()
+    }
+
+    internal fun addToFavorites(quote: Quote) {
+        viewModelScope.launch {
+            quoteRepository.addToFavorites(quote)
+        }
+    }
+
+    internal fun removeFromFavorites(quote: Quote) {
+        viewModelScope.launch {
+            quoteRepository.removeFromFavorites(quote)
+        }
     }
 
     private fun setQuotesFromApiResponse(apiResponse: ApiQuoteResult) {
