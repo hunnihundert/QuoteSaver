@@ -22,17 +22,24 @@ class QuoteFeedAdapter(private val quotes: List<Quote>, private val favoriteQuot
 
         fun bindView(quote: Quote, favoriteClickListener: (Quote) -> Unit, favoriteQuotes: List<Quote>) {
             binding.textViewListItemQuoteQuote.text = quote.quote
-            binding.imageViewListItemQuoteLiked.setOnClickListener {
+            binding.imageViewListItemQuoteFavorite.setOnClickListener {
                 addToFavorites(quote, favoriteClickListener, favoriteQuotes)
             }
             binding.imageViewListItemQuoteShare.setOnClickListener {
                 shareQuote(quote)
             }
             setBackgroundImage(binding.imageViewListItemQuoteBackgroundImage, quote.image!!.toInt())
+            setFavoriteImage(favoriteQuotes.contains(quote))
+        }
 
-            if (favoriteQuotes.contains(quote)) binding.imageViewListItemQuoteLiked.setImageResource(R.drawable.ic_favorite)
-            else binding.imageViewListItemQuoteLiked.setImageResource(R.drawable.ic_favorite_border)
+        private fun addToFavorites(quote: Quote, likeClickListener: (Quote) -> Unit, favoriteQuotes: List<Quote>) {
+            likeClickListener(quote)
+            setFavoriteImage(favoriteQuotes.contains(quote))
+        }
 
+        private fun setFavoriteImage(isFavorite: Boolean) {
+            if (isFavorite) binding.imageViewListItemQuoteFavorite.setImageResource(R.drawable.ic_favorite)
+            else binding.imageViewListItemQuoteFavorite.setImageResource(R.drawable.ic_favorite_border)
         }
 
         private fun shareQuote(quote: Quote) {
@@ -52,12 +59,6 @@ class QuoteFeedAdapter(private val quotes: List<Quote>, private val favoriteQuot
                 .fit()
                 .centerCrop()
                 .into(view)
-        }
-
-        private fun addToFavorites(quote: Quote, likeClickListener: (Quote) -> Unit, favoriteQuotes: List<Quote>) {
-            likeClickListener(quote)
-            if (favoriteQuotes.contains(quote)) binding.imageViewListItemQuoteLiked.setImageResource(R.drawable.ic_favorite)
-            else binding.imageViewListItemQuoteLiked.setImageResource(R.drawable.ic_favorite_border)
         }
 
     }
