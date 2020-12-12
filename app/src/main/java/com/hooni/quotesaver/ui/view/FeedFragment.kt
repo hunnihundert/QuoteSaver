@@ -89,7 +89,7 @@ class FeedFragment : Fragment() {
     private fun initImageView() {
         favoritesImageView = binding.imageViewFeedFavorites
         favoritesImageView.setOnClickListener {
-            findNavController().navigate(FeedFragmentDirections.actionFeedFragmentToLikedQuotesFragment())
+            findNavController().navigate(FeedFragmentDirections.actionFeedFragmentToFavoritesFragment())
         }
     }
 

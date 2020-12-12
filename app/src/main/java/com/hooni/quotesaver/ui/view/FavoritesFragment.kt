@@ -10,15 +10,15 @@ import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.hooni.quotesaver.data.model.Quote
-import com.hooni.quotesaver.databinding.FragmentLikedQuotesBinding
+import com.hooni.quotesaver.databinding.FragmentFavoriteQuotesBinding
 import com.hooni.quotesaver.ui.adapter.QuoteFeedAdapter
 import com.hooni.quotesaver.ui.viewmodel.FeedViewModel
 import org.koin.androidx.viewmodel.ext.android.sharedViewModel
 
-class LikedQuotesFragment: Fragment() {
+class FavoritesFragment: Fragment() {
 
     private val feedViewModel: FeedViewModel by sharedViewModel()
-    private lateinit var binding: FragmentLikedQuotesBinding
+    private lateinit var binding: FragmentFavoriteQuotesBinding
 
     private lateinit var back: ImageView
 
@@ -32,7 +32,7 @@ class LikedQuotesFragment: Fragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        binding = FragmentLikedQuotesBinding.inflate(inflater,container,false)
+        binding = FragmentFavoriteQuotesBinding.inflate(inflater,container,false)
         binding.lifecycleOwner = viewLifecycleOwner
         return binding.root
     }
@@ -51,7 +51,7 @@ class LikedQuotesFragment: Fragment() {
     private fun initBackButton() {
         back = binding.imageViewFavoritesBack
         back.setOnClickListener {
-            findNavController().navigate(LikedQuotesFragmentDirections.actionLikedQuotesFragmentToFeedFragment())
+            findNavController().navigate(FavoritesFragmentDirections.actionFavoritesFragmentToFeedFragment())
         }
     }
 

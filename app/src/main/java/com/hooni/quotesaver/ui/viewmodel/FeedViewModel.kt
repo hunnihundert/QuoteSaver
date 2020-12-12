@@ -1,5 +1,6 @@
 package com.hooni.quotesaver.ui.viewmodel
 
+import android.util.Log
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.asLiveData
@@ -83,6 +84,9 @@ class FeedViewModel(private val quoteRepository: QuoteRepository) : ViewModel() 
     }
 
     private fun setQuotesFromApiResponse(apiResponse: ApiQuoteResult) {
+        Log.d(
+            TAG,
+            "setQuotesFromApiResponse: next: ${apiResponse.next}, previous: ${apiResponse.previous}, result: ${apiResponse.results}")
         nextItems.value = apiResponse.next
         previousItems.value = apiResponse.next
         val newList = mutableListOf<Quote>()
@@ -90,6 +94,7 @@ class FeedViewModel(private val quoteRepository: QuoteRepository) : ViewModel() 
             newList.add(Quote(quote.quote, quote.author, quote.likes, quote.tags, quote.pk, getRandomImage().toString(), quote.language))
         }
         quotes.value = newList
+        Log.d(TAG, "setQuotesFromApiResponse: newList: $newList, quotes: ${quotes.value}")
     }
 
     internal fun startNewRequest() {
