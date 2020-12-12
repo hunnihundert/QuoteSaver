@@ -87,6 +87,6 @@ dependencies {
     implementation "androidx.navigation:navigation-ui-ktx:$nav_version"
     androidTestImplementation "androidx.navigation:navigation-testing:$nav_version"
 
-    // Coil
-    implementation "io.coil-kt:coil:$coil_version"
+    // Picasso
+    implementation "com.squareup.picasso:picasso:$picasso_version"
 }

@@ -25,5 +25,4 @@ val backgroundImages = listOf(
     R.drawable.background_18,
     R.drawable.background_19,
     R.drawable.background_20,
-
 )

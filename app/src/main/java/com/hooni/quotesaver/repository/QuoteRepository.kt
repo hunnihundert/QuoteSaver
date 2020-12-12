@@ -14,7 +14,7 @@ class QuoteRepository(private val quotesApi: QuotesApi, private val favoriteQuot
         return quotesApi.getTags()
     }
 
-    suspend fun getQuotesByCategory(category: String, offsetParameter: Int = com.hooni.quotesaver.util.NUMBER_OF_QUOTES_RETURNED_AT_ONCE): ApiQuoteResult {
+    suspend fun getQuotesByCategory(category: String, offsetParameter: Int = 0): ApiQuoteResult {
         return quotesApi.getQuotesByCategory(
             category,
             NUMBER_OF_QUOTES_RETURNED_AT_ONCE,

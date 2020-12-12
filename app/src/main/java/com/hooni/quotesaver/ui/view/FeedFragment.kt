@@ -63,6 +63,7 @@ class FeedFragment : Fragment() {
         initDisplayedQuotes()
     }
 
+
     private fun initUi() {
         initSearchTextInput()
         initImageView()
@@ -74,7 +75,7 @@ class FeedFragment : Fragment() {
         searchTextInputLayout.setOnEditorActionListener() { _, actionId, _ ->
             when (actionId) {
                 EditorInfo.IME_ACTION_SEARCH, EditorInfo.IME_ACTION_DONE, EditorInfo.IME_ACTION_GO, EditorInfo.IME_ACTION_SEND -> {
-                    feedViewModel.getQuotesByCategory()
+                    feedViewModel.startNewRequest()
                     hideKeyboard()
                     true
                 }
@@ -104,14 +105,13 @@ class FeedFragment : Fragment() {
         feedRecyclerView.addOnScrollListener(endOfListDetector)
     }
 
-    private fun loadNewItems() {
-        feedViewModel.addNewItems()
-    }
 
     private fun initObserver() {
         feedViewModel.quotes.observe(viewLifecycleOwner) { quoteList ->
-
-            if(feedViewModel.isNewRequest()) resetRecyclerView()
+            if(feedViewModel.isNewRequest) {
+                resetRecyclerView()
+                feedViewModel.resetNewRequest()
+            }
             updateRecyclerView(quoteList)
             moveEditTextCursorToEnd()
         }
@@ -120,8 +120,12 @@ class FeedFragment : Fragment() {
         }
     }
 
-    private fun updateDisplayedQuotes(quoteList: List<Quote>) {
+    private fun resetRecyclerView() {
+        feedRecyclerView.scrollToPosition(0)
         displayedQuotes.clear()
+    }
+
+    private fun updateRecyclerView(quoteList: List<Quote>) {
         displayedQuotes.addAll(quoteList)
         feedAdapter.notifyDataSetChanged()
     }
@@ -136,23 +140,20 @@ class FeedFragment : Fragment() {
         feedAdapter.notifyDataSetChanged()
     }
 
+
     private fun initDisplayedQuotes() {
-        if(feedViewModel.currentSearchTerm.isEmpty()) setRandomQuoteList()
-    }
-
-    private fun resetRecyclerView() {
-        feedRecyclerView.scrollToPosition(0)
-        displayedQuotes.clear()
-    }
-
-    private fun updateRecyclerView(quoteList: List<Quote>) {
-        displayedQuotes.addAll(quoteList)
-        feedAdapter.notifyDataSetChanged()
+        if(feedViewModel.lastRequestedSearch.isEmpty()) setRandomQuoteList()
     }
 
     private fun setRandomQuoteList() {
         feedViewModel.loadRandomQuotes()
     }
+
+
+    private fun loadNewItems() {
+        feedViewModel.addNewItems()
+    }
+
 
     private fun Fragment.hideKeyboard() {
         view?.let {activity?.hideKeyboard(it)}

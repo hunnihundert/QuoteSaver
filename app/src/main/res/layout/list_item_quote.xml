@@ -9,10 +9,15 @@
         android:layout_margin="4dp"
         android:clipToPadding="true"
         android:padding="23dp"
-        app:cardBackgroundColor="#FFFF00"
+        app:cardBackgroundColor="#333333"
         app:cardCornerRadius="12dp"
         app:cardElevation="4dp"
         app:cardMaxElevation="4dp">
+
+        <ImageView
+            android:id="@+id/imageView_listItemQuote_backgroundImage"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" />
 
         <TextView
             android:id="@+id/textView_listItemQuote_quote"
@@ -20,10 +25,9 @@
             android:layout_height="match_parent"
             android:layout_margin="16dp"
             android:gravity="center"
-            android:textColor="#333333"
+            android:textColor="#FFFFDD"
             android:textSize="24sp"
             tools:text="Whether you think you can or you cannot, you are always right."
-            tools:textColor="#333333"
             tools:textSize="32sp" />
 
         <ImageView
@@ -33,7 +37,8 @@
             android:layout_gravity="bottom|end"
             android:layout_margin="12dp"
             android:contentDescription="@string/contentDescription_imageView_listItemQuote_favorite"
-            android:src="@drawable/ic_favorite_border" />
+            android:src="@drawable/ic_favorite_border"
+            app:tint="#FFFFDD" />
 
         <ImageView
             android:id="@+id/imageView_listItemQuote_share"
@@ -42,7 +47,8 @@
             android:layout_gravity="bottom|start"
             android:layout_margin="12dp"
             android:contentDescription="@string/contentDescription_imageView_listItemQuote_share"
-            android:src="@drawable/ic_share" />
+            android:src="@drawable/ic_share"
+            app:tint="#FFFFDD" />
 
     </androidx.cardview.widget.CardView>
 </layout>
