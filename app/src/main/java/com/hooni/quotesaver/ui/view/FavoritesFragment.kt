@@ -5,6 +5,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
+import android.widget.TextView
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -21,6 +22,7 @@ class FavoritesFragment: Fragment() {
     private lateinit var binding: FragmentFavoriteQuotesBinding
 
     private lateinit var back: ImageView
+    private lateinit var noFavoritesTextView: TextView
 
     private lateinit var favoriteQuotesRecyclerView: RecyclerView
     private lateinit var favoriteQuotesAdapter: QuoteFeedAdapter
@@ -45,6 +47,7 @@ class FavoritesFragment: Fragment() {
 
     private fun initUi() {
         initBackButton()
+        initNoFavoritesText()
         initRecyclerView()
     }
 
@@ -53,6 +56,11 @@ class FavoritesFragment: Fragment() {
         back.setOnClickListener {
             findNavController().navigate(FavoritesFragmentDirections.actionFavoritesFragmentToFeedFragment())
         }
+    }
+
+    private fun initNoFavoritesText() {
+        noFavoritesTextView = binding.textViewFavoritesNoFavorites
+        noFavoritesTextView.visibility = View.VISIBLE
     }
 
     private fun initRecyclerView() {
@@ -70,6 +78,7 @@ class FavoritesFragment: Fragment() {
     private fun initObserver() {
         feedViewModel.favoriteQuotes.observe(viewLifecycleOwner) { updatedFavoriteQuotes ->
             updateFavoriteQuotes(updatedFavoriteQuotes)
+            switchNoResultsTextVisibility(updatedFavoriteQuotes.isEmpty())
         }
     }
 
@@ -77,5 +86,10 @@ class FavoritesFragment: Fragment() {
         favoriteQuotes.clear()
         favoriteQuotes.addAll(updatedFavoriteQuotes)
         favoriteQuotesAdapter.notifyDataSetChanged()
+    }
+
+    private fun switchNoResultsTextVisibility(listIsEmpty: Boolean) {
+        if(listIsEmpty) noFavoritesTextView.visibility = View.VISIBLE
+        else noFavoritesTextView.visibility = View.GONE
     }
 }
