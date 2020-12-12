@@ -4,10 +4,10 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.asLiveData
 import androidx.lifecycle.viewModelScope
-import com.hooni.quotesaver.repository.QuoteRepository
 import com.hooni.quotesaver.data.model.ApiQuoteResult
 import com.hooni.quotesaver.data.model.Quote
-import com.hooni.quotesaver.util.NUMBER_OF_QUOTES_RETURNED_AT_ONCE
+import com.hooni.quotesaver.repository.QuoteRepository
+import com.hooni.quotesaver.util.getRandomImage
 import kotlinx.coroutines.launch
 
 class FeedViewModel(private val quoteRepository: QuoteRepository) : ViewModel() {
@@ -19,14 +19,14 @@ class FeedViewModel(private val quoteRepository: QuoteRepository) : ViewModel() 
     val quotes = MutableLiveData<List<Quote>>()
     val favoriteQuotes = quoteRepository.getAllFavorites().asLiveData()
     val searchTerm = MutableLiveData("")
-    var currentSearchTerm = ""
+    var isNewRequest = true
 
     // in case of the user having typed in a new search term but hasn't tapped the search button
     // Scrolling to the bottom triggers a new request, which is based on lastRequestSearch
     // (and not searchTerm LiveData)
-    private var lastRequestedSearch = ""
-    private val nextItems = MutableLiveData("")
-    private val previousItems = MutableLiveData("")
+    internal var lastRequestedSearch = ""
+    private val nextItems = MutableLiveData<String?>()
+    private val previousItems = MutableLiveData<String?>()
 
     internal fun loadRandomQuotes() {
         viewModelScope.launch {
@@ -37,9 +37,8 @@ class FeedViewModel(private val quoteRepository: QuoteRepository) : ViewModel() 
 
     private suspend fun setRandomCategory() {
         val randomCategory = getTags().random()
-        currentSearchTerm = randomCategory
         searchTerm.value = randomCategory
-        lastRequestedSearch = randomCategory
+        lastRequestedSearch = searchTerm.value!!
     }
 
     private suspend fun getTags(): List<String> {
@@ -47,21 +46,17 @@ class FeedViewModel(private val quoteRepository: QuoteRepository) : ViewModel() 
         return tags.map { it.name }
     }
 
-    internal fun getQuotesByCategory() {
+    private fun getQuotesByCategory() {
         if (isSearchTermEmpty()) {
             // Inform user about search term being empty
         } else {
             viewModelScope.launch {
-                currentSearchTerm = searchTerm.value!!
-                val apiResponse = quoteRepository.getQuotesByCategory(searchTerm.value!!)
-                setQuotesFromApiResponse(apiResponse)
-                nextItems.value?.let {
-                    val offset = getOffset(nextItems.value)
-                    val apiResponse =
+                lastRequestedSearch = searchTerm.value!!
+                val offset = getOffset(nextItems.value)
+                val apiResponse =
                         if (offset == -1) quoteRepository.getQuotesByCategory(lastRequestedSearch)
                         else quoteRepository.getQuotesByCategory(lastRequestedSearch, offset)
-                    setQuotesFromApiResponse(apiResponse)
-                }
+                setQuotesFromApiResponse(apiResponse)
             }
         }
     }
@@ -71,7 +66,7 @@ class FeedViewModel(private val quoteRepository: QuoteRepository) : ViewModel() 
     }
 
     private fun getOffset(url: String?): Int {
-        return if(url.isNullOrBlank()) -1
+        return if (url.isNullOrBlank()) -1
         else url.substringAfter("offset=").substringBeforeLast("&tags").toInt()
     }
 
@@ -90,7 +85,11 @@ class FeedViewModel(private val quoteRepository: QuoteRepository) : ViewModel() 
     private fun setQuotesFromApiResponse(apiResponse: ApiQuoteResult) {
         nextItems.value = apiResponse.next
         previousItems.value = apiResponse.next
-        quotes.value = apiResponse.results
+        val newList = mutableListOf<Quote>()
+        apiResponse.results.forEach { quote ->
+            newList.add(Quote(quote.quote, quote.author, quote.likes, quote.tags, quote.pk, getRandomImage().toString(), quote.language))
+        }
+        quotes.value = newList
     }
 
     internal fun startNewRequest() {
@@ -99,17 +98,18 @@ class FeedViewModel(private val quoteRepository: QuoteRepository) : ViewModel() 
     }
 
     private fun resetRequestParameters() {
+        isNewRequest = true
         nextItems.value = ""
         previousItems.value = ""
         lastRequestedSearch = searchTerm.value!!
     }
 
-    internal fun isNewRequest(): Boolean {
-        return getOffset(nextItems.value) == NUMBER_OF_QUOTES_RETURNED_AT_ONCE*2
+    internal fun addNewItems() {
+        if (nextItems.value != null) getQuotesByCategory()
     }
 
-    internal fun addNewItems() {
-        if(nextItems.value != null) getQuotesByCategory()
+    internal fun resetNewRequest() {
+        isNewRequest = false
     }
 
 }

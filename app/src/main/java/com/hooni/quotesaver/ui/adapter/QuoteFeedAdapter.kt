@@ -3,10 +3,12 @@ package com.hooni.quotesaver.ui.adapter
 import android.content.Intent
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import android.widget.ImageView
 import androidx.recyclerview.widget.RecyclerView
 import com.hooni.quotesaver.R
 import com.hooni.quotesaver.data.model.Quote
 import com.hooni.quotesaver.databinding.ListItemQuoteBinding
+import com.squareup.picasso.Picasso
 
 class QuoteFeedAdapter(private val quotes: List<Quote>, private val favoriteQuotes: List<Quote>, private val favoriteClickListener: (Quote) -> Unit) :
     RecyclerView.Adapter<QuoteFeedAdapter.QuoteViewHolder>() {
@@ -26,6 +28,7 @@ class QuoteFeedAdapter(private val quotes: List<Quote>, private val favoriteQuot
             binding.imageViewListItemQuoteShare.setOnClickListener {
                 shareQuote(quote)
             }
+            setBackgroundImage(binding.imageViewListItemQuoteBackgroundImage, quote.image!!.toInt())
 
             if (favoriteQuotes.contains(quote)) binding.imageViewListItemQuoteLiked.setImageResource(R.drawable.ic_favorite)
             else binding.imageViewListItemQuoteLiked.setImageResource(R.drawable.ic_favorite_border)
@@ -41,6 +44,14 @@ class QuoteFeedAdapter(private val quotes: List<Quote>, private val favoriteQuot
 
             val shareIntent = Intent.createChooser(intentContent, "Share your Quote!")
             binding.root.context.startActivity(shareIntent)
+        }
+
+        private fun setBackgroundImage(view: ImageView, resourceId: Int) {
+            Picasso.get()
+                .load(resourceId)
+                .fit()
+                .centerCrop()
+                .into(view)
         }
 
         private fun addToFavorites(quote: Quote, likeClickListener: (Quote) -> Unit, favoriteQuotes: List<Quote>) {

@@ -31,7 +31,7 @@ class LikedQuotesFragment: Fragment() {
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
+    ): View {
         binding = FragmentLikedQuotesBinding.inflate(inflater,container,false)
         binding.lifecycleOwner = viewLifecycleOwner
         return binding.root
