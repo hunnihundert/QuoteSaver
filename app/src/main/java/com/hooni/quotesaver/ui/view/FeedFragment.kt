@@ -72,7 +72,7 @@ class FeedFragment : Fragment() {
 
     private fun initSearchTextInput() {
         searchTextInputLayout = binding.editTextFeedSearch
-        searchTextInputLayout.setOnEditorActionListener() { _, actionId, _ ->
+        searchTextInputLayout.setOnEditorActionListener { _, actionId, _ ->
             when (actionId) {
                 EditorInfo.IME_ACTION_SEARCH, EditorInfo.IME_ACTION_DONE, EditorInfo.IME_ACTION_GO, EditorInfo.IME_ACTION_SEND -> {
                     feedViewModel.startNewRequest()
