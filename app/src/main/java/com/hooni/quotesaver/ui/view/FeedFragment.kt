@@ -10,6 +10,7 @@ import android.view.inputmethod.EditorInfo
 import android.view.inputmethod.InputMethodManager
 import android.widget.EditText
 import android.widget.ImageView
+import android.widget.TextView
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -31,6 +32,7 @@ class FeedFragment : Fragment() {
 
     private lateinit var searchTextInputLayout: EditText
     private lateinit var favoritesImageView: ImageView
+    private lateinit var noResultsTextView: TextView
     private lateinit var feedRecyclerView: RecyclerView
     private lateinit var feedAdapter: QuoteFeedAdapter
     private val endOfListDetector: RecyclerView.OnScrollListener =
@@ -67,6 +69,7 @@ class FeedFragment : Fragment() {
     private fun initUi() {
         initSearchTextInput()
         initImageView()
+        initTextView()
         initRecyclerView()
     }
 
@@ -93,6 +96,11 @@ class FeedFragment : Fragment() {
         }
     }
 
+    private fun initTextView() {
+        noResultsTextView = binding.textViewFeedNoResults
+        noResultsTextView.visibility = View.VISIBLE
+    }
+
     private fun initRecyclerView() {
         val favoriteStatusChanger: (Quote) -> Unit = { quote ->
             if (favoriteQuotes.contains(quote)) feedViewModel.removeFromFavorites(quote)
@@ -114,6 +122,7 @@ class FeedFragment : Fragment() {
             }
             updateRecyclerView(quoteList)
             moveEditTextCursorToEnd()
+            switchNoResultsTextVisibility(quoteList.isEmpty())
         }
         feedViewModel.favoriteQuotes.observe(viewLifecycleOwner) { favoriteQuoteList ->
             updateFavoriteQuotes(favoriteQuoteList)
@@ -132,6 +141,11 @@ class FeedFragment : Fragment() {
 
     private fun moveEditTextCursorToEnd() {
         searchTextInputLayout.setSelection(searchTextInputLayout.length())
+    }
+
+    private fun switchNoResultsTextVisibility(listIsEmpty: Boolean) {
+        if(listIsEmpty) noResultsTextView.visibility = View.VISIBLE
+        else noResultsTextView.visibility = View.GONE
     }
 
     private fun updateFavoriteQuotes(favoriteQuoteList: List<Quote>) {
