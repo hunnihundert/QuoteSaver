@@ -31,7 +31,7 @@
             tools:textSize="32sp" />
 
         <ImageView
-            android:id="@+id/imageView_listItemQuote_liked"
+            android:id="@+id/imageView_listItemQuote_favorite"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="bottom|end"

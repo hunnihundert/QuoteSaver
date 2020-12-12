@@ -11,18 +11,18 @@
         android:label="FeedFragment"
         tools:layout="@layout/fragment_feed">
         <action
-            android:id="@+id/action_feedFragment_to_likedQuotesFragment"
-            app:destination="@id/likedQuotesFragment"
+            android:id="@+id/action_feedFragment_to_favoritesFragment"
+            app:destination="@id/FavoritesFragment"
             app:enterAnim="@anim/slide_in_right"
             app:exitAnim="@anim/slide_out_left" />
     </fragment>
     <fragment
-        android:id="@+id/likedQuotesFragment"
-        android:name="com.hooni.quotesaver.ui.view.LikedQuotesFragment"
-        android:label="LikedQuotesFragment"
-        tools:layout="@layout/fragment_liked_quotes">
+        android:id="@+id/FavoritesFragment"
+        android:name="com.hooni.quotesaver.ui.view.FavoritesFragment"
+        android:label="FavoritesFragment"
+        tools:layout="@layout/fragment_favorite_quotes">
         <action
-            android:id="@+id/action_likedQuotesFragment_to_feedFragment"
+            android:id="@+id/action_favoritesFragment_to_feedFragment"
             app:destination="@id/feedFragment"
             app:enterAnim="@anim/slide_in_left"
             app:exitAnim="@anim/slide_out_right" />
