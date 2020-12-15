@@ -3,6 +3,7 @@ package com.hooni.quotesaver.ui.view
 import android.app.Activity
 import android.content.Context
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -16,6 +17,7 @@ import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.hooni.quotesaver.data.model.Quote
+import com.hooni.quotesaver.data.remote.Status
 import com.hooni.quotesaver.databinding.FragmentFeedBinding
 import com.hooni.quotesaver.ui.adapter.QuoteFeedAdapter
 import com.hooni.quotesaver.ui.viewmodel.FeedViewModel
@@ -126,6 +128,15 @@ class FeedFragment : Fragment() {
         }
         feedViewModel.favoriteQuotes.observe(viewLifecycleOwner) { favoriteQuoteList ->
             updateFavoriteQuotes(favoriteQuoteList)
+        }
+        feedViewModel.changedQuotes.observe(viewLifecycleOwner) { apiResult ->
+            if(feedViewModel.isNewRequest) {
+                resetRecyclerView()
+                feedViewModel.resetNewRequest()
+            }
+            updateRecyclerView(apiResult)
+            moveEditTextCursorToEnd()
+            switchNoResultsTextVisibility(apiResult.isEmpty())
         }
     }
 

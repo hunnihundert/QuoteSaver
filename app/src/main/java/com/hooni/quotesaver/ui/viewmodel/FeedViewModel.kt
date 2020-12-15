@@ -1,14 +1,16 @@
 package com.hooni.quotesaver.ui.viewmodel
 
 import android.util.Log
-import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.asLiveData
-import androidx.lifecycle.viewModelScope
+import androidx.lifecycle.*
 import com.hooni.quotesaver.data.model.ApiQuoteResult
+import com.hooni.quotesaver.data.model.ApiTagResult
 import com.hooni.quotesaver.data.model.Quote
+import com.hooni.quotesaver.data.remote.Resource
+import com.hooni.quotesaver.data.remote.Status
 import com.hooni.quotesaver.repository.QuoteRepository
 import com.hooni.quotesaver.util.getRandomImage
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.launch
 
 class FeedViewModel(private val quoteRepository: QuoteRepository) : ViewModel() {
@@ -21,6 +23,26 @@ class FeedViewModel(private val quoteRepository: QuoteRepository) : ViewModel() 
     val favoriteQuotes = quoteRepository.getAllFavorites().asLiveData()
     val searchTerm = MutableLiveData("")
     var isNewRequest = true
+
+    private val justQuotes: LiveData<Resource<ApiQuoteResult>> = searchTerm.switchMap {
+        liveData(Dispatchers.IO) {
+            emit(Resource.loading(null))
+            emit(quoteRepository.getQuotesByCategory(lastRequestedSearch, nextItems.value))
+        }
+    }
+
+
+    val changedQuotes = justQuotes.switchMap { justQuotes ->
+        nextItems.value = justQuotes.data?.next
+        previousItems.value = justQuotes.data?.previous
+        val newList = mutableListOf<Quote>()
+        justQuotes.data?.results?.forEach { quote ->
+            newList.add(Quote(quote.quote, quote.author, quote.likes, quote.tags, quote.pk, getRandomImage().toString(), quote.language))
+        }
+        liveData<List<Quote>> {
+            emit(newList)
+        }
+    }
 
     // in case of the user having typed in a new search term but hasn't tapped the search button
     // Scrolling to the bottom triggers a new request, which is based on lastRequestSearch
@@ -37,15 +59,23 @@ class FeedViewModel(private val quoteRepository: QuoteRepository) : ViewModel() 
     }
 
     private suspend fun setRandomCategory() {
-        val randomCategory = getTags().random()
+        val randomCategory = getTags().random().name
         searchTerm.value = randomCategory
         lastRequestedSearch = searchTerm.value!!
     }
 
-    private suspend fun getTags(): List<String> {
-        val tags = quoteRepository.getTags().results
-        return tags.map { it.name }
+    private suspend fun getTags(): List<ApiTagResult.QuoteTags> {
+        val tagApiResponse = quoteRepository.getTags()
+
+        when(tagApiResponse.status) {
+            Status.LOADING -> {}
+            Status.ERROR -> {}
+            Status.SUCCESS -> {}
+        }
+
+        return tagApiResponse.data!!.results!!
     }
+
 
     private fun getQuotesByCategory() {
         if (isSearchTermEmpty()) {
@@ -53,22 +83,14 @@ class FeedViewModel(private val quoteRepository: QuoteRepository) : ViewModel() 
         } else {
             viewModelScope.launch {
                 lastRequestedSearch = searchTerm.value!!
-                val offset = getOffset(nextItems.value)
-                val apiResponse =
-                        if (offset == -1) quoteRepository.getQuotesByCategory(lastRequestedSearch)
-                        else quoteRepository.getQuotesByCategory(lastRequestedSearch, offset)
-                setQuotesFromApiResponse(apiResponse)
+                val apiResponse = quoteRepository.getQuotesByCategory(lastRequestedSearch, nextItems.value)
+                //setQuotesFromApiResponse(apiResponse)
             }
         }
     }
 
     private fun isSearchTermEmpty(): Boolean {
         return searchTerm.value.isNullOrBlank()
-    }
-
-    private fun getOffset(url: String?): Int {
-        return if (url.isNullOrBlank()) -1
-        else url.substringAfter("offset=").substringBeforeLast("&tags").toInt()
     }
 
     internal fun addToFavorites(quote: Quote) {
@@ -94,7 +116,6 @@ class FeedViewModel(private val quoteRepository: QuoteRepository) : ViewModel() 
             newList.add(Quote(quote.quote, quote.author, quote.likes, quote.tags, quote.pk, getRandomImage().toString(), quote.language))
         }
         quotes.value = newList
-        Log.d(TAG, "setQuotesFromApiResponse: newList: $newList, quotes: ${quotes.value}")
     }
 
     internal fun startNewRequest() {
