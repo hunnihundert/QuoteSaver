@@ -10,7 +10,6 @@ import com.hooni.quotesaver.data.remote.Status
 import com.hooni.quotesaver.repository.QuoteRepository
 import com.hooni.quotesaver.util.getRandomImage
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.launch
 
 class FeedViewModel(private val quoteRepository: QuoteRepository) : ViewModel() {
@@ -19,37 +18,33 @@ class FeedViewModel(private val quoteRepository: QuoteRepository) : ViewModel() 
         private const val TAG = "FeedViewModel"
     }
 
-    val quotes = MutableLiveData<List<Quote>>()
     val favoriteQuotes = quoteRepository.getAllFavorites().asLiveData()
     val searchTerm = MutableLiveData("")
     var isNewRequest = true
-
-    private val justQuotes: LiveData<Resource<ApiQuoteResult>> = searchTerm.switchMap {
-        liveData(Dispatchers.IO) {
-            emit(Resource.loading(null))
-            emit(quoteRepository.getQuotesByCategory(lastRequestedSearch, nextItems.value))
-        }
-    }
-
-
-    val changedQuotes = justQuotes.switchMap { justQuotes ->
-        nextItems.value = justQuotes.data?.next
-        previousItems.value = justQuotes.data?.previous
-        val newList = mutableListOf<Quote>()
-        justQuotes.data?.results?.forEach { quote ->
-            newList.add(Quote(quote.quote, quote.author, quote.likes, quote.tags, quote.pk, getRandomImage().toString(), quote.language))
-        }
-        liveData<List<Quote>> {
-            emit(newList)
-        }
-    }
-
-    // in case of the user having typed in a new search term but hasn't tapped the search button
-    // Scrolling to the bottom triggers a new request, which is based on lastRequestSearch
-    // (and not searchTerm LiveData)
-    internal var lastRequestedSearch = ""
+    internal var lastRequestedSearch = MutableLiveData("")
     private val nextItems = MutableLiveData<String?>()
     private val previousItems = MutableLiveData<String?>()
+
+    private val apiQueryResponse: LiveData<Resource<ApiQuoteResult>> = lastRequestedSearch.switchMap {
+        liveData(Dispatchers.IO) {
+            emit(Resource.loading(null))
+            emit(quoteRepository.getQuotesByCategory(lastRequestedSearch.value!!, nextItems.value))
+        }
+    }
+
+    val apiQueryResponseWithQuotesWithImages: LiveData<Resource<ApiQuoteResult>> = apiQueryResponse.switchMap { apiQueryResponse ->
+        if (apiQueryResponse.status == Status.SUCCESS) {
+            setNextPreviousItems(apiQueryResponse)
+            liveData {
+                emit(createQuotesWithImages(apiQueryResponse))
+            }
+        } else {
+            liveData {
+                emit(apiQueryResponse)
+            }
+        }
+    }
+
 
     internal fun loadRandomQuotes() {
         viewModelScope.launch {
@@ -61,36 +56,30 @@ class FeedViewModel(private val quoteRepository: QuoteRepository) : ViewModel() 
     private suspend fun setRandomCategory() {
         val randomCategory = getTags().random().name
         searchTerm.value = randomCategory
-        lastRequestedSearch = searchTerm.value!!
+        lastRequestedSearch.value = searchTerm.value!!
     }
 
     private suspend fun getTags(): List<ApiTagResult.QuoteTags> {
         val tagApiResponse = quoteRepository.getTags()
 
-        when(tagApiResponse.status) {
-            Status.LOADING -> {}
-            Status.ERROR -> {}
-            Status.SUCCESS -> {}
-        }
-
-        return tagApiResponse.data!!.results!!
-    }
-
-
-    private fun getQuotesByCategory() {
-        if (isSearchTermEmpty()) {
-            // Inform user about search term being empty
-        } else {
-            viewModelScope.launch {
-                lastRequestedSearch = searchTerm.value!!
-                val apiResponse = quoteRepository.getQuotesByCategory(lastRequestedSearch, nextItems.value)
-                //setQuotesFromApiResponse(apiResponse)
+        return when (tagApiResponse.status) {
+            Status.LOADING -> {
+                //how loading indicator
+                listOf()
+            }
+            Status.ERROR -> {
+                // inform about error
+                listOf()
+            }
+            Status.SUCCESS -> {
+                tagApiResponse.data!!.results!!
             }
         }
     }
 
-    private fun isSearchTermEmpty(): Boolean {
-        return searchTerm.value.isNullOrBlank()
+
+    private fun getQuotesByCategory() {
+        lastRequestedSearch.value = searchTerm.value!!
     }
 
     internal fun addToFavorites(quote: Quote) {
@@ -105,29 +94,20 @@ class FeedViewModel(private val quoteRepository: QuoteRepository) : ViewModel() 
         }
     }
 
-    private fun setQuotesFromApiResponse(apiResponse: ApiQuoteResult) {
-        Log.d(
-            TAG,
-            "setQuotesFromApiResponse: next: ${apiResponse.next}, previous: ${apiResponse.previous}, result: ${apiResponse.results}")
-        nextItems.value = apiResponse.next
-        previousItems.value = apiResponse.next
-        val newList = mutableListOf<Quote>()
-        apiResponse.results.forEach { quote ->
-            newList.add(Quote(quote.quote, quote.author, quote.likes, quote.tags, quote.pk, getRandomImage().toString(), quote.language))
-        }
-        quotes.value = newList
-    }
-
     internal fun startNewRequest() {
-        resetRequestParameters()
-        getQuotesByCategory()
+        if(searchTerm.value.isNullOrBlank()) {
+            // empty search
+        } else {
+            resetRequestParameters()
+            getQuotesByCategory()
+        }
+
     }
 
     private fun resetRequestParameters() {
         isNewRequest = true
         nextItems.value = ""
         previousItems.value = ""
-        lastRequestedSearch = searchTerm.value!!
     }
 
     internal fun addNewItems() {
@@ -136,6 +116,30 @@ class FeedViewModel(private val quoteRepository: QuoteRepository) : ViewModel() 
 
     internal fun resetNewRequest() {
         isNewRequest = false
+    }
+
+    private fun setNextPreviousItems(apiQueryResponse: Resource<ApiQuoteResult>) {
+        nextItems.value = apiQueryResponse.data!!.next
+        previousItems.value = apiQueryResponse.data.previous
+    }
+
+    private fun createQuotesWithImages(apiQueryResponse: Resource<ApiQuoteResult>): Resource<ApiQuoteResult> {
+        val quotesWithImages = mutableListOf<Quote>()
+        apiQueryResponse.data!!.results.forEach { quote ->
+            quotesWithImages.add(
+                Quote(
+                    quote.quote,
+                    quote.author,
+                    quote.likes,
+                    quote.tags,
+                    quote.pk,
+                    getRandomImage().toString(),
+                    quote.language
+                )
+            )
+        }
+        val a = ApiQuoteResult(apiQueryResponse.data.next,apiQueryResponse.data.previous,quotesWithImages)
+        return Resource(apiQueryResponse.status,a,apiQueryResponse.message)
     }
 
 }

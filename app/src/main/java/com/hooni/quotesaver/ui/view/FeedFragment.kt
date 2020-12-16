@@ -11,11 +11,14 @@ import android.view.inputmethod.EditorInfo
 import android.view.inputmethod.InputMethodManager
 import android.widget.EditText
 import android.widget.ImageView
+import android.widget.ProgressBar
 import android.widget.TextView
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.hooni.quotesaver.R
+import com.hooni.quotesaver.data.model.ApiQuoteResult
 import com.hooni.quotesaver.data.model.Quote
 import com.hooni.quotesaver.data.remote.Status
 import com.hooni.quotesaver.databinding.FragmentFeedBinding
@@ -117,26 +120,31 @@ class FeedFragment : Fragment() {
 
 
     private fun initObserver() {
-        feedViewModel.quotes.observe(viewLifecycleOwner) { quoteList ->
-            if(feedViewModel.isNewRequest) {
-                resetRecyclerView()
-                feedViewModel.resetNewRequest()
-            }
-            updateRecyclerView(quoteList)
-            moveEditTextCursorToEnd()
-            switchNoResultsTextVisibility(quoteList.isEmpty())
-        }
         feedViewModel.favoriteQuotes.observe(viewLifecycleOwner) { favoriteQuoteList ->
             updateFavoriteQuotes(favoriteQuoteList)
         }
-        feedViewModel.changedQuotes.observe(viewLifecycleOwner) { apiResult ->
+        feedViewModel.apiQueryResponseWithQuotesWithImages.observe(viewLifecycleOwner) { apiResult ->
             if(feedViewModel.isNewRequest) {
                 resetRecyclerView()
                 feedViewModel.resetNewRequest()
             }
-            updateRecyclerView(apiResult)
-            moveEditTextCursorToEnd()
-            switchNoResultsTextVisibility(apiResult.isEmpty())
+
+            when(apiResult.status) {
+                Status.SUCCESS -> {
+                    updateRecyclerView(apiResult.data!!.results)
+                    moveEditTextCursorToEnd()
+                    switchNoResultsTextVisibility(apiResult.data.results.isEmpty())
+                }
+                Status.ERROR -> {
+                    Log.d(TAG, "initObserver: ${apiResult.status}, ${apiResult.message}")
+                    noResultsTextView.text = getString(R.string.textView_feed_error, apiResult.message)
+                    noResultsTextView.visibility = View.VISIBLE
+                }
+                Status.LOADING -> {
+                    Log.d(TAG, "initObserver: $apiResult.status, ${apiResult.message}")
+                }
+            }
+
         }
     }
 
@@ -155,7 +163,10 @@ class FeedFragment : Fragment() {
     }
 
     private fun switchNoResultsTextVisibility(listIsEmpty: Boolean) {
-        if(listIsEmpty) noResultsTextView.visibility = View.VISIBLE
+        if(listIsEmpty) {
+            noResultsTextView.visibility = View.VISIBLE
+            noResultsTextView.text = getString(R.string.textView_feed_noResults)
+        }
         else noResultsTextView.visibility = View.GONE
     }
 
@@ -167,7 +178,7 @@ class FeedFragment : Fragment() {
 
 
     private fun initDisplayedQuotes() {
-        if(feedViewModel.lastRequestedSearch.isEmpty()) setRandomQuoteList()
+        if(feedViewModel.lastRequestedSearch.value!!.isEmpty()) setRandomQuoteList()
     }
 
     private fun setRandomQuoteList() {
