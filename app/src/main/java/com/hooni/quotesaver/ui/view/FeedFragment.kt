@@ -11,14 +11,13 @@ import android.view.inputmethod.EditorInfo
 import android.view.inputmethod.InputMethodManager
 import android.widget.EditText
 import android.widget.ImageView
-import android.widget.ProgressBar
 import android.widget.TextView
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.google.android.material.snackbar.Snackbar
 import com.hooni.quotesaver.R
-import com.hooni.quotesaver.data.model.ApiQuoteResult
 import com.hooni.quotesaver.data.model.Quote
 import com.hooni.quotesaver.data.remote.Status
 import com.hooni.quotesaver.databinding.FragmentFeedBinding
@@ -67,7 +66,7 @@ class FeedFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         initUi()
         initObserver()
-        initDisplayedQuotes()
+        loadRandomQuotes()
     }
 
 
@@ -123,29 +122,50 @@ class FeedFragment : Fragment() {
         feedViewModel.favoriteQuotes.observe(viewLifecycleOwner) { favoriteQuoteList ->
             updateFavoriteQuotes(favoriteQuoteList)
         }
-        feedViewModel.apiQueryResponseWithQuotesWithImages.observe(viewLifecycleOwner) { apiResult ->
-            if(feedViewModel.isNewRequest) {
-                resetRecyclerView()
-                feedViewModel.resetNewRequest()
-            }
-
-            when(apiResult.status) {
+        feedViewModel.apiQueryResponseWithQuotesWithImages.observe(viewLifecycleOwner) { apiResultsQuotes ->
+            when(apiResultsQuotes.status) {
                 Status.SUCCESS -> {
-                    updateRecyclerView(apiResult.data!!.results)
+                    if(feedViewModel.getIsNewRequest()) {
+                        resetRecyclerView()
+                        feedViewModel.resetNewRequest()
+                    }
+                    updateRecyclerView(apiResultsQuotes.data!!.results)
                     moveEditTextCursorToEnd()
-                    switchNoResultsTextVisibility(apiResult.data.results.isEmpty())
+                    switchNoResultsTextVisibility(apiResultsQuotes.data.results.isEmpty())
                 }
                 Status.ERROR -> {
-                    Log.d(TAG, "initObserver: ${apiResult.status}, ${apiResult.message}")
-                    noResultsTextView.text = getString(R.string.textView_feed_error, apiResult.message)
+                    Log.d(TAG, "quotes, error: ${apiResultsQuotes.status}, ${apiResultsQuotes.message}")
+                    noResultsTextView.text = getString(R.string.textView_feed_error, apiResultsQuotes.message)
                     noResultsTextView.visibility = View.VISIBLE
                 }
                 Status.LOADING -> {
-                    Log.d(TAG, "initObserver: $apiResult.status, ${apiResult.message}")
+                    Log.d(TAG, "quotes, loading: $apiResultsQuotes.status, ${apiResultsQuotes.message}")
                 }
             }
-
         }
+        feedViewModel.progress.observe(viewLifecycleOwner) { progress ->
+            when(progress) {
+                is FeedViewModel.Progress.Loading -> {
+                    Log.d(TAG, "Status: loading")
+                }
+                is FeedViewModel.Progress.Error -> {
+                    Log.d(TAG, "Status: error")
+                    progress.message
+                    showError(progress.message)
+                }
+                is FeedViewModel.Progress.Idle -> {
+                    // do nothing
+                }
+            }
+        }
+    }
+
+    private fun showError(message: String?) {
+        val errorMessage = getString(R.string.textView_feed_error, message ?: "Unknown Error")
+        noResultsTextView.text = errorMessage
+        noResultsTextView.visibility = View.VISIBLE
+        val snackBar = Snackbar.make(binding.root,errorMessage,Snackbar.LENGTH_SHORT)
+        snackBar.show()
     }
 
     private fun resetRecyclerView() {
@@ -177,12 +197,8 @@ class FeedFragment : Fragment() {
     }
 
 
-    private fun initDisplayedQuotes() {
-        if(feedViewModel.lastRequestedSearch.value!!.isEmpty()) setRandomQuoteList()
-    }
-
-    private fun setRandomQuoteList() {
-        feedViewModel.loadRandomQuotes()
+    private fun loadRandomQuotes() {
+        if(feedViewModel.lastRequestedSearch.isEmpty()) feedViewModel.loadRandomQuotes()
     }
 
 
