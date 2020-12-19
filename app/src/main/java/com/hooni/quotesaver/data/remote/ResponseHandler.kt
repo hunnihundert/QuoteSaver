@@ -17,6 +17,10 @@ class ResponseHandler {
         }
     }
 
+    fun <T : Any> handleLoading(data: T): Resource<T> {
+        return Resource.loading(data)
+    }
+
     private fun getErrorMessage(code: Int): String {
         return when (code) {
             SOCKET_TIMEOUT_EXCEPTION -> "Socket Timeout"

@@ -9,6 +9,8 @@ import com.hooni.quotesaver.data.remote.Resource
 import com.hooni.quotesaver.data.remote.Status.*
 import com.hooni.quotesaver.repository.QuoteRepository
 import com.hooni.quotesaver.util.getRandomImage
+import kotlinx.coroutines.flow.onCompletion
+import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.launch
 
 class FeedViewModel(private val quoteRepository: QuoteRepository) : ViewModel() {
@@ -24,7 +26,11 @@ class FeedViewModel(private val quoteRepository: QuoteRepository) : ViewModel() 
     }
 
     internal val progress = MutableLiveData<Progress>(Progress.Idle)
-    internal val favoriteQuotes = quoteRepository.getAllFavorites().asLiveData()
+    internal val favoriteQuotes = quoteRepository.getAllFavorites().onStart {
+        progress.value = Progress.Loading
+    }.onCompletion {
+        progress.value = Progress.Idle
+    }.asLiveData()
     internal val apiQueryResponseWithQuotesWithImages = MutableLiveData<Resource<ApiQuoteResult>>()
     val searchTerm = MutableLiveData("")
     internal var lastRequestedSearch = ""
@@ -44,6 +50,7 @@ class FeedViewModel(private val quoteRepository: QuoteRepository) : ViewModel() 
                     progress.value = Progress.Error(tags.message ?: "Unknown Error")
                 }
                 SUCCESS -> {
+                    progress.value = Progress.Idle
                     setRandomCategory(tags.data!!.results!!)
                     lastRequestedSearch = searchTerm.value!!
                     getQuotesByCategory()
@@ -78,6 +85,7 @@ class FeedViewModel(private val quoteRepository: QuoteRepository) : ViewModel() 
                     progress.value = Progress.Error(apiResult.message ?: "Unknown Error")
                 }
                 SUCCESS -> {
+                    progress.value = Progress.Idle
                     apiQueryResponseWithQuotesWithImages.value = addImageToQuotes(apiResult)
                 }
             }
