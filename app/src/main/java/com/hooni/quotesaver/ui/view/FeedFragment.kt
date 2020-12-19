@@ -11,6 +11,7 @@ import android.view.inputmethod.EditorInfo
 import android.view.inputmethod.InputMethodManager
 import android.widget.EditText
 import android.widget.ImageView
+import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
@@ -36,6 +37,7 @@ class FeedFragment : Fragment() {
 
     private lateinit var searchTextInputLayout: EditText
     private lateinit var favoritesImageView: ImageView
+    private lateinit var loadingView: LinearLayout
     private lateinit var noResultsTextView: TextView
     private lateinit var feedRecyclerView: RecyclerView
     private lateinit var feedAdapter: QuoteFeedAdapter
@@ -73,7 +75,8 @@ class FeedFragment : Fragment() {
     private fun initUi() {
         initSearchTextInput()
         initImageView()
-        initTextView()
+        initLoadingView()
+        initErrorTextView()
         initRecyclerView()
     }
 
@@ -100,7 +103,12 @@ class FeedFragment : Fragment() {
         }
     }
 
-    private fun initTextView() {
+    private fun initLoadingView() {
+        loadingView = binding.linearLayoutFeedLoading
+        loadingView.visibility = View.GONE
+    }
+
+    private fun initErrorTextView() {
         noResultsTextView = binding.textViewFeedNoResults
         noResultsTextView.visibility = View.VISIBLE
     }
@@ -146,15 +154,15 @@ class FeedFragment : Fragment() {
         feedViewModel.progress.observe(viewLifecycleOwner) { progress ->
             when(progress) {
                 is FeedViewModel.Progress.Loading -> {
-                    Log.d(TAG, "Status: loading")
+                    loadingView.visibility = View.VISIBLE
                 }
                 is FeedViewModel.Progress.Error -> {
-                    Log.d(TAG, "Status: error")
+                    loadingView.visibility = View.GONE
                     progress.message
                     showError(progress.message)
                 }
                 is FeedViewModel.Progress.Idle -> {
-                    // do nothing
+                    loadingView.visibility = View.GONE
                 }
             }
         }

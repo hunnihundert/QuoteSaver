@@ -29,13 +29,12 @@
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent">
 
-
                 <com.google.android.material.textfield.TextInputEditText
                     android:id="@+id/editText_feed_search"
                     android:layout_width="0dp"
                     android:layout_height="40dp"
                     android:layout_weight="8"
-                    android:background="@drawable/shape_editText_rounded"
+                    android:background="@drawable/shape_edittext_rounded"
                     android:drawableEnd="?android:attr/actionModeWebSearchDrawable"
                     android:hint="@string/hint_textInputEditText_feed_search"
                     android:imeOptions="actionSearch"
@@ -56,6 +55,36 @@
 
             </LinearLayout>
 
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/recyclerView_feed_quoteFeed"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:paddingHorizontal="4dp"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/linearLayout_feed_search"
+                tools:itemCount="4"
+                tools:listitem="@layout/list_item_quote"/>
+
+            <LinearLayout
+                android:id="@+id/linearLayout_feed_loading"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:background="#AACCCCCC"
+                android:gravity="center"
+                android:visibility="gone"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/linearLayout_feed_search">
+
+                <ProgressBar
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:indeterminate="true" />
+            </LinearLayout>
+
             <TextView
                 android:id="@+id/textView_feed_noResults"
                 android:layout_width="match_parent"
@@ -68,17 +97,6 @@
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@id/linearLayout_feed_search" />
 
-            <androidx.recyclerview.widget.RecyclerView
-                android:id="@+id/recyclerView_feed_quoteFeed"
-                android:layout_width="match_parent"
-                android:layout_height="0dp"
-                android:paddingHorizontal="4dp"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/linearLayout_feed_search"
-                tools:itemCount="4"
-                tools:listitem="@layout/list_item_quote" />
 
         </androidx.constraintlayout.widget.ConstraintLayout>
     </androidx.coordinatorlayout.widget.CoordinatorLayout>

@@ -10,6 +10,8 @@ import com.hooni.quotesaver.data.remote.Resource
 import com.hooni.quotesaver.data.remote.ResponseHandler
 import com.hooni.quotesaver.util.NUMBER_OF_QUOTES_RETURNED_AT_ONCE
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.observeOn
 import java.lang.Exception
 
 class QuoteRepository(
@@ -25,10 +27,8 @@ class QuoteRepository(
 
     suspend fun getTags(): Resource<ApiTagResult> {
         return try {
-            Log.d(TAG, "getTags: starting")
             responseHandler.handleSuccess(quotesApi.getTags())
         } catch (e: Exception) {
-            Log.d(TAG, "getTags: $e")
             responseHandler.handleException(e)
         }
     }
@@ -54,9 +54,7 @@ class QuoteRepository(
     }
 
     fun getAllFavorites(): Flow<List<Quote>> {
-        Log.d(TAG, "getAllFavorites: starting")
         return favoriteQuotesDao.getAllFavoriteQuotes()
-
     }
 
     suspend fun addToFavorites(quote: Quote) {

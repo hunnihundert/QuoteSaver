@@ -5,6 +5,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
+import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
@@ -14,6 +15,7 @@ import com.hooni.quotesaver.data.model.Quote
 import com.hooni.quotesaver.databinding.FragmentFavoriteQuotesBinding
 import com.hooni.quotesaver.ui.adapter.QuoteFeedAdapter
 import com.hooni.quotesaver.ui.viewmodel.FeedViewModel
+import com.hooni.quotesaver.ui.viewmodel.FeedViewModel.Progress.*
 import org.koin.androidx.viewmodel.ext.android.sharedViewModel
 
 class FavoritesFragment: Fragment() {
@@ -23,6 +25,7 @@ class FavoritesFragment: Fragment() {
 
     private lateinit var back: ImageView
     private lateinit var noFavoritesTextView: TextView
+    private lateinit var loadingView: LinearLayout
 
     private lateinit var favoriteQuotesRecyclerView: RecyclerView
     private lateinit var favoriteQuotesAdapter: QuoteFeedAdapter
@@ -47,6 +50,7 @@ class FavoritesFragment: Fragment() {
 
     private fun initUi() {
         initBackButton()
+        initLoadingView()
         initNoFavoritesText()
         initRecyclerView()
     }
@@ -56,6 +60,11 @@ class FavoritesFragment: Fragment() {
         back.setOnClickListener {
             findNavController().navigate(FavoritesFragmentDirections.actionFavoritesFragmentToFeedFragment())
         }
+    }
+
+    private fun initLoadingView() {
+        loadingView = binding.linearLayoutFavoritesLoading
+        loadingView.visibility = View.GONE
     }
 
     private fun initNoFavoritesText() {
@@ -79,6 +88,21 @@ class FavoritesFragment: Fragment() {
         feedViewModel.favoriteQuotes.observe(viewLifecycleOwner) { updatedFavoriteQuotes ->
             updateFavoriteQuotes(updatedFavoriteQuotes)
             switchNoResultsTextVisibility(updatedFavoriteQuotes.isEmpty())
+        }
+        feedViewModel.progress.observe(viewLifecycleOwner) { progress ->
+            when(progress) {
+                is Idle -> {
+                    loadingView.visibility = View.GONE
+                }
+                is Error -> {
+                    // show error
+                    loadingView.visibility = View.GONE
+                }
+                is Loading -> {
+                    loadingView.visibility = View.VISIBLE
+                }
+            }
+
         }
     }
 

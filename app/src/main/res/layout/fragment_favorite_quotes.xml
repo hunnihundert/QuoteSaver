@@ -11,24 +11,24 @@
             android:id="@+id/imageView_favorites_back"
             android:layout_width="wrap_content"
             android:layout_height="40dp"
+            android:contentDescription="@string/contentDescription_imageView_favorites_back"
             android:padding="4dp"
             android:src="@drawable/abc_vector_test"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            app:tint="@color/black"
-            android:contentDescription="@string/contentDescription_imageView_favorites_back" />
+            app:tint="@color/black" />
 
         <TextView
             android:id="@+id/textView_favorites_noFavorites"
             android:layout_width="match_parent"
             android:layout_height="0dp"
-            app:layout_constraintTop_toBottomOf="@id/imageView_favorites_back"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintBottom_toBottomOf="parent"
             android:gravity="center"
+            android:text="@string/textView_favorites_noFavorites"
             android:visibility="gone"
-            android:text="@string/textView_favorites_noFavorites"/>
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/imageView_favorites_back" />
 
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/recyclerView_favorites_quotes"
@@ -38,6 +38,24 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/imageView_favorites_back"
             tools:listitem="@layout/list_item_quote" />
+
+        <LinearLayout
+            android:id="@+id/linearLayout_favorites_loading"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:background="#AACCCCCC"
+            android:gravity="center"
+            android:visibility="gone"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/imageView_favorites_back">
+
+            <ProgressBar
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:indeterminate="true" />
+        </LinearLayout>
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>
