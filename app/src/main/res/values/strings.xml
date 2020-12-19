@@ -5,4 +5,5 @@
     <string name="ContentDescription_imageButton_feed_search">Search</string>
     <string name="textView_feed_noResults">No search results</string>
     <string name="textView_favorites_noFavorites">No favorites added</string>
+    <string name="textView_feed_error">Error while loading: %1$s</string>
 </resources>
