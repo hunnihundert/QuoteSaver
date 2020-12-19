@@ -72,11 +72,9 @@ class FeedViewModel(private val quoteRepository: QuoteRepository) : ViewModel() 
 
     private fun getQuotesByCategory() {
         viewModelScope.launch {
-            Log.d(TAG, "getQuotesByCategory: starting")
             progress.value = Progress.Loading
             val apiResult =
                 quoteRepository.getQuotesByCategory(lastRequestedSearch, nextItems.value)
-            Log.d(TAG, "getQuotesByCategory: $apiResult / status: ${apiResult.status}")
             when (apiResult.status) {
                 LOADING -> {
                     progress.value = Progress.Loading

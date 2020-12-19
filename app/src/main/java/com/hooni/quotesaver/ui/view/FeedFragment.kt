@@ -25,6 +25,7 @@ import com.hooni.quotesaver.databinding.FragmentFeedBinding
 import com.hooni.quotesaver.ui.adapter.QuoteFeedAdapter
 import com.hooni.quotesaver.ui.viewmodel.FeedViewModel
 import org.koin.androidx.viewmodel.ext.android.sharedViewModel
+import kotlin.math.log
 
 class FeedFragment : Fragment() {
 
@@ -45,7 +46,8 @@ class FeedFragment : Fragment() {
         object : RecyclerView.OnScrollListener() {
             override fun onScrollStateChanged(recyclerView: RecyclerView, newState: Int) {
                 super.onScrollStateChanged(recyclerView, newState)
-                if (!feedRecyclerView.canScrollVertically(1) && newState == RecyclerView.SCROLL_STATE_IDLE) loadNewItems()
+                Log.d(TAG, "onScrollStateChanged: end of list detected!")
+                if (!feedRecyclerView.canScrollVertically(1) && newState == RecyclerView.SCROLL_STATE_IDLE && feedViewModel.progress.value != FeedViewModel.Progress.Loading) loadNewItems()
             }
         }
 
@@ -211,6 +213,7 @@ class FeedFragment : Fragment() {
 
 
     private fun loadNewItems() {
+        Log.d(TAG, "loadNewItems: loading new items!")
         feedViewModel.addNewItems()
     }
 
