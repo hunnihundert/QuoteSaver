@@ -17,7 +17,8 @@
         <ImageView
             android:id="@+id/imageView_listItemQuote_backgroundImage"
             android:layout_width="match_parent"
-            android:layout_height="match_parent" />
+            android:layout_height="match_parent"
+            android:contentDescription="@string/contentDescription_imageView_listItem_background" />
 
         <TextView
             android:id="@+id/textView_listItemQuote_quote"

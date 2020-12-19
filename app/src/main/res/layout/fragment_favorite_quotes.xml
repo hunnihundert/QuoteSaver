@@ -15,7 +15,8 @@
             android:src="@drawable/abc_vector_test"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            app:tint="@color/black" />
+            app:tint="@color/black"
+            android:contentDescription="@string/contentDescription_imageView_favorites_back" />
 
         <TextView
             android:id="@+id/textView_favorites_noFavorites"
