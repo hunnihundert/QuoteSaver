@@ -11,7 +11,7 @@ import kotlinx.coroutines.flow.Flow
 interface FavoriteQuotesDao {
 
     @Query("SELECT * from quote")
-    fun getAllFavoriteQuotes(): Flow<List<Quote>>
+    fun getAllFavoriteQuotes(): List<Quote>
 
     @Insert
     suspend fun addFavoriteQuote(quote: Quote)

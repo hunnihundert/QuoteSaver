@@ -15,6 +15,11 @@
             app:destination="@id/FavoritesFragment"
             app:enterAnim="@anim/slide_in_right"
             app:exitAnim="@anim/slide_out_left" />
+        <action
+            android:id="@+id/action_feedFragment_to_fullscreenFragment"
+            app:destination="@id/fullscreenFragment"
+            app:enterAnim="@anim/fragment_fade_enter"
+            app:exitAnim="@anim/fragment_fade_exit"/>
     </fragment>
     <fragment
         android:id="@+id/FavoritesFragment"
@@ -26,5 +31,26 @@
             app:destination="@id/feedFragment"
             app:enterAnim="@anim/slide_in_left"
             app:exitAnim="@anim/slide_out_right" />
+        <action
+            android:id="@+id/action_favoritesFragment_to_fullscreenFragment"
+            app:destination="@id/fullscreenFragment"
+            app:enterAnim="@anim/fragment_fade_enter"
+            app:exitAnim="@anim/fragment_fade_exit"/>
+    </fragment>
+    <fragment
+        android:id="@+id/fullscreenFragment"
+        android:name="com.hooni.quotesaver.ui.view.FullscreenFragment"
+        android:label="FullscreenFragment"
+        tools:layout="@layout/fragment_fullscreen">
+        <action
+            android:id="@+id/action_fullscreenFragment_to_feedFragment"
+            app:destination="@+id/feedFragment"
+            app:enterAnim="@anim/fragment_fade_enter"
+            app:exitAnim="@anim/fragment_fade_exit"/>
+        <action
+            android:id="@+id/action_fullscreenFragment_to_FavoritesFragment"
+            app:destination="@+id/FavoritesFragment"
+            app:enterAnim="@anim/fragment_fade_enter"
+            app:exitAnim="@anim/fragment_fade_exit"/>
     </fragment>
 </navigation>

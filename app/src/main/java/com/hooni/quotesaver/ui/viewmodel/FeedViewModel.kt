@@ -10,6 +10,7 @@ import com.hooni.quotesaver.data.remote.Status.*
 import com.hooni.quotesaver.repository.QuoteRepository
 import com.hooni.quotesaver.util.getRandomImage
 import kotlinx.coroutines.flow.onCompletion
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.launch
 
@@ -26,17 +27,21 @@ class FeedViewModel(private val quoteRepository: QuoteRepository) : ViewModel() 
     }
 
     internal val progress = MutableLiveData<Progress>(Progress.Idle)
-    internal val favoriteQuotes = quoteRepository.getAllFavorites().onStart {
-        progress.value = Progress.Loading
-    }.onCompletion {
-        progress.value = Progress.Idle
-    }.asLiveData()
+    internal val favoriteQuotes = quoteRepository.getAllFavorites()
+        .onStart {
+            Log.d(TAG, "quote repo get all fav loading: ")
+            progress.value = Progress.Loading }
+        .onCompletion {
+            Log.d(TAG, "quote repo get all fav done: ")
+            progress.value = Progress.Idle }
+        .asLiveData()
     internal val apiQueryResponseWithQuotesWithImages = MutableLiveData<Resource<ApiQuoteResult>>()
     val searchTerm = MutableLiveData("")
     internal var lastRequestedSearch = ""
     private var isNewRequest = true
     private val nextItems = MutableLiveData<String?>()
     private val previousItems = MutableLiveData<String?>()
+    private lateinit var fullScreenQuote: Quote
 
 
     internal fun loadRandomQuotes() {
@@ -44,16 +49,16 @@ class FeedViewModel(private val quoteRepository: QuoteRepository) : ViewModel() 
             val tags = getTags()
             when (tags.status) {
                 LOADING -> {
+                    Log.d(TAG, "loadRandomQuotes: get tags loading")
                     progress.value = Progress.Loading
                 }
                 ERROR -> {
+                    progress.value = Progress.Idle
                     progress.value = Progress.Error(tags.message ?: "Unknown Error")
                 }
                 SUCCESS -> {
                     progress.value = Progress.Idle
                     setRandomCategory(tags.data!!.results!!)
-                    lastRequestedSearch = searchTerm.value!!
-                    getQuotesByCategory()
                 }
             }
         }
@@ -77,9 +82,11 @@ class FeedViewModel(private val quoteRepository: QuoteRepository) : ViewModel() 
                 quoteRepository.getQuotesByCategory(lastRequestedSearch, nextItems.value)
             when (apiResult.status) {
                 LOADING -> {
+                    Log.d(TAG, "getQuotesByCategory: api result status loading")
                     progress.value = Progress.Loading
                 }
                 ERROR -> {
+                    progress.value = Progress.Idle
                     progress.value = Progress.Error(apiResult.message ?: "Unknown Error")
                 }
                 SUCCESS -> {
@@ -105,12 +112,26 @@ class FeedViewModel(private val quoteRepository: QuoteRepository) : ViewModel() 
         apiQueryResponse.data!!.results.forEach { quote ->
             quotesWithImages.add(
                 Quote(
-                    quote.quote, quote.author, quote.likes, quote.tags, quote.pk, getRandomImage().toString(), quote.language
+                    quote.quote,
+                    quote.author,
+                    quote.likes,
+                    quote.tags,
+                    quote.pk,
+                    getRandomImage().toString(),
+                    quote.language
                 )
             )
         }
-        val apiQuoteResultsWithImages = ApiQuoteResult( apiQueryResponse.data.next, apiQueryResponse.data.previous, quotesWithImages)
-        return Resource(apiQueryResponse.status, apiQuoteResultsWithImages, apiQueryResponse.message)
+        val apiQuoteResultsWithImages = ApiQuoteResult(
+            apiQueryResponse.data.next,
+            apiQueryResponse.data.previous,
+            quotesWithImages
+        )
+        return Resource(
+            apiQueryResponse.status,
+            apiQuoteResultsWithImages,
+            apiQueryResponse.message
+        )
     }
 
     internal fun addToFavorites(quote: Quote) {
@@ -142,6 +163,7 @@ class FeedViewModel(private val quoteRepository: QuoteRepository) : ViewModel() 
     }
 
     internal fun addNewItems() {
+        Log.d(TAG, "addNewItems: starting")
         if (nextItems.value != null) getQuotesByCategory()
     }
 
@@ -151,6 +173,14 @@ class FeedViewModel(private val quoteRepository: QuoteRepository) : ViewModel() 
 
     internal fun getIsNewRequest() = isNewRequest
 
+    internal fun setQuote(quote: Quote){
+        Log.d(TAG, "setQuote: $quote")
+        fullScreenQuote = quote
+    }
 
+    internal fun getQuote(): Quote {
+        Log.d(TAG, "getQuote: $fullScreenQuote")
+        return fullScreenQuote
+    }
 
 }

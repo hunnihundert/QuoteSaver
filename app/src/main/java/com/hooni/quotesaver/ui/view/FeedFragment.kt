@@ -120,7 +120,12 @@ class FeedFragment : Fragment() {
             if (favoriteQuotes.contains(quote)) feedViewModel.removeFromFavorites(quote)
             else feedViewModel.addToFavorites(quote)
         }
-        feedAdapter = QuoteFeedAdapter(displayedQuotes, favoriteQuotes, favoriteStatusChanger)
+        val fullscreenOpener: (Quote) -> Unit = { quote ->
+            feedViewModel.setQuote(quote)
+            Log.d(TAG, "fullscreenOpener: $quote")
+            findNavController().navigate(FeedFragmentDirections.actionFeedFragmentToFullscreenFragment())
+        }
+        feedAdapter = QuoteFeedAdapter(displayedQuotes, favoriteQuotes, favoriteStatusChanger, fullscreenOpener)
         feedRecyclerView = binding.recyclerViewFeedQuoteFeed
         feedRecyclerView.layoutManager = LinearLayoutManager(requireContext())
         feedRecyclerView.adapter = feedAdapter
@@ -154,16 +159,20 @@ class FeedFragment : Fragment() {
             }
         }
         feedViewModel.progress.observe(viewLifecycleOwner) { progress ->
+            Log.d(TAG, "initObserver: observe progress")
             when(progress) {
                 is FeedViewModel.Progress.Loading -> {
+                    Log.d(TAG, "progress: loading")
                     loadingView.visibility = View.VISIBLE
                 }
                 is FeedViewModel.Progress.Error -> {
+                    Log.d(TAG, "progress: error")
                     loadingView.visibility = View.GONE
                     progress.message
                     showError(progress.message)
                 }
                 is FeedViewModel.Progress.Idle -> {
+                    Log.d(TAG, "progress: idle")
                     loadingView.visibility = View.GONE
                 }
             }
