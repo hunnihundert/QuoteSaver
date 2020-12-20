@@ -9,9 +9,8 @@ import com.hooni.quotesaver.data.remote.QuotesApi
 import com.hooni.quotesaver.data.remote.Resource
 import com.hooni.quotesaver.data.remote.ResponseHandler
 import com.hooni.quotesaver.util.NUMBER_OF_QUOTES_RETURNED_AT_ONCE
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.flow
-import kotlinx.coroutines.flow.observeOn
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.*
 import java.lang.Exception
 
 class QuoteRepository(
@@ -54,7 +53,10 @@ class QuoteRepository(
     }
 
     fun getAllFavorites(): Flow<List<Quote>> {
-        return favoriteQuotesDao.getAllFavoriteQuotes()
+        return flow{
+
+            emit(favoriteQuotesDao.getAllFavoriteQuotes())
+        }.flowOn(Dispatchers.IO)
     }
 
     suspend fun addToFavorites(quote: Quote) {

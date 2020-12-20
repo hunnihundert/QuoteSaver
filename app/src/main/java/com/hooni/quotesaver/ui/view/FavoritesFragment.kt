@@ -1,6 +1,7 @@
 package com.hooni.quotesaver.ui.view
 
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -77,8 +78,12 @@ class FavoritesFragment: Fragment() {
             if (favoriteQuotes.contains(quote)) feedViewModel.removeFromFavorites(quote)
             else feedViewModel.addToFavorites(quote)
         }
+        val fullscreenOpener: (Quote) -> Unit = { quote ->
+            feedViewModel.setQuote(quote)
+            findNavController().navigate(FavoritesFragmentDirections.actionFavoritesFragmentToFullscreenFragment())
+        }
 
-        favoriteQuotesAdapter = QuoteFeedAdapter(favoriteQuotes,favoriteQuotes,favoriteStatusChanger)
+        favoriteQuotesAdapter = QuoteFeedAdapter(favoriteQuotes,favoriteQuotes,favoriteStatusChanger,fullscreenOpener)
         favoriteQuotesRecyclerView = binding.recyclerViewFavoritesQuotes
         favoriteQuotesRecyclerView.layoutManager = LinearLayoutManager(requireContext())
         favoriteQuotesRecyclerView.adapter = favoriteQuotesAdapter
