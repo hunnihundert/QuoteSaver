@@ -1,6 +1,5 @@
 package com.hooni.quotesaver.repository
 
-import android.util.Log
 import com.hooni.quotesaver.data.local.FavoriteQuotesDao
 import com.hooni.quotesaver.data.model.ApiQuoteResult
 import com.hooni.quotesaver.data.model.ApiTagResult
@@ -10,8 +9,9 @@ import com.hooni.quotesaver.data.remote.Resource
 import com.hooni.quotesaver.data.remote.ResponseHandler
 import com.hooni.quotesaver.util.NUMBER_OF_QUOTES_RETURNED_AT_ONCE
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.*
-import java.lang.Exception
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.flowOn
 
 class QuoteRepository(
     private val quotesApi: QuotesApi,

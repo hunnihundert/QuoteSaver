@@ -25,7 +25,6 @@ import com.hooni.quotesaver.databinding.FragmentFeedBinding
 import com.hooni.quotesaver.ui.adapter.QuoteFeedAdapter
 import com.hooni.quotesaver.ui.viewmodel.FeedViewModel
 import org.koin.androidx.viewmodel.ext.android.sharedViewModel
-import kotlin.math.log
 
 class FeedFragment : Fragment() {
 
@@ -229,10 +228,6 @@ class FeedFragment : Fragment() {
 
     private fun Fragment.hideKeyboard() {
         view?.let {activity?.hideKeyboard(it)}
-    }
-
-    private fun Activity.hideKeyboard() {
-        hideKeyboard(currentFocus ?: View(this))
     }
 
     private fun Context.hideKeyboard(view: View) {

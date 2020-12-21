@@ -31,7 +31,7 @@
             android:textSize="24sp"
             android:maxLines="5"
             android:ellipsize="end"
-            tools:text="aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaWhether you think you can or you cannot, you are always right."
+            tools:text="Whether you think you can or you cannot, you are always right."
             tools:ellipsize="end"
             tools:maxLines="5"
             tools:textSize="32sp" />

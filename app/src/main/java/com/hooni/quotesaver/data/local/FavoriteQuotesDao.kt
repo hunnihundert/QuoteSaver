@@ -5,7 +5,6 @@ import androidx.room.Delete
 import androidx.room.Insert
 import androidx.room.Query
 import com.hooni.quotesaver.data.model.Quote
-import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface FavoriteQuotesDao {
