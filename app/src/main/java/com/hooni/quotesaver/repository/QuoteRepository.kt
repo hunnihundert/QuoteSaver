@@ -1,5 +1,6 @@
 package com.hooni.quotesaver.repository
 
+import android.util.Log
 import com.hooni.quotesaver.data.local.FavoriteQuotesDao
 import com.hooni.quotesaver.data.model.ApiQuoteResult
 import com.hooni.quotesaver.data.model.ApiTagResult
@@ -53,10 +54,7 @@ class QuoteRepository(
     }
 
     fun getAllFavorites(): Flow<List<Quote>> {
-        return flow{
-
-            emit(favoriteQuotesDao.getAllFavoriteQuotes())
-        }.flowOn(Dispatchers.IO)
+        return favoriteQuotesDao.getAllFavoriteQuotes()
     }
 
     suspend fun addToFavorites(quote: Quote) {

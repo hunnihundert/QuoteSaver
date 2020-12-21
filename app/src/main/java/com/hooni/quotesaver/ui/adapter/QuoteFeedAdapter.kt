@@ -1,6 +1,7 @@
 package com.hooni.quotesaver.ui.adapter
 
 import android.content.Intent
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import android.widget.ImageView
@@ -33,6 +34,7 @@ class QuoteFeedAdapter(
         ) {
             binding.textViewListItemQuoteQuote.text = quote.quote
             binding.imageViewListItemQuoteFavorite.setOnClickListener {
+                Log.d(TAG, "bindView: add to favorites")
                 addToFavorites(quote, favoriteClickListener, favoriteQuotes)
             }
             binding.imageViewListItemQuoteShare.setOnClickListener {
@@ -43,15 +45,14 @@ class QuoteFeedAdapter(
             }
             setBackgroundImage(binding.imageViewListItemQuoteBackgroundImage, quote.image!!.toInt())
             setFavoriteImage(favoriteQuotes.contains(quote))
-
         }
 
         private fun addToFavorites(
             quote: Quote,
-            likeClickListener: (Quote) -> Unit,
+            favoriteClickListener: (Quote) -> Unit,
             favoriteQuotes: List<Quote>
         ) {
-            likeClickListener(quote)
+            favoriteClickListener(quote)
             setFavoriteImage(favoriteQuotes.contains(quote))
         }
 
@@ -75,6 +76,7 @@ class QuoteFeedAdapter(
         }
 
         private fun setFavoriteImage(isFavorite: Boolean) {
+            Log.d(TAG, "setFavoriteImage: isFavorite: $isFavorite")
             if (isFavorite) binding.imageViewListItemQuoteFavorite.setImageResource(R.drawable.ic_favorite)
             else binding.imageViewListItemQuoteFavorite.setImageResource(R.drawable.ic_favorite_border)
         }

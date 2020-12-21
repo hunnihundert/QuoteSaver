@@ -13,6 +13,7 @@ import com.hooni.quotesaver.data.remote.Status.*
 import com.hooni.quotesaver.repository.QuoteRepository
 import com.hooni.quotesaver.util.getRandomImage
 import kotlinx.coroutines.flow.onCompletion
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.launch
 
@@ -33,7 +34,7 @@ class FeedViewModel(private val quoteRepository: QuoteRepository) : ViewModel() 
         .onStart {
             Log.d(TAG, "quote repo get all fav loading: ")
             progress.value = Progress.Loading }
-        .onCompletion {
+        .onEach {
             Log.d(TAG, "quote repo get all fav done: ")
             progress.value = Progress.Idle }
         .asLiveData()
@@ -138,12 +139,14 @@ class FeedViewModel(private val quoteRepository: QuoteRepository) : ViewModel() 
 
     internal fun addToFavorites(quote: Quote) {
         viewModelScope.launch {
+            Log.d(TAG, "addToFavorites: $quote")
             quoteRepository.addToFavorites(quote)
         }
     }
 
     internal fun removeFromFavorites(quote: Quote) {
         viewModelScope.launch {
+            Log.d(TAG, "removeFromFavorites: $quote")
             quoteRepository.removeFromFavorites(quote)
         }
     }

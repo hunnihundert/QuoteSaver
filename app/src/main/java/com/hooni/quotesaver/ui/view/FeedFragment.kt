@@ -116,6 +116,7 @@ class FeedFragment : Fragment() {
 
     private fun initRecyclerView() {
         val favoriteStatusChanger: (Quote) -> Unit = { quote ->
+            Log.d(TAG, "favoriteClickListener: contains: ${favoriteQuotes.contains(quote)}")
             if (favoriteQuotes.contains(quote)) feedViewModel.removeFromFavorites(quote)
             else feedViewModel.addToFavorites(quote)
         }
