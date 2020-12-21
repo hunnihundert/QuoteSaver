@@ -13,6 +13,7 @@ import android.widget.EditText
 import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.TextView
+import androidx.activity.OnBackPressedCallback
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -24,6 +25,7 @@ import com.hooni.quotesaver.data.remote.Status
 import com.hooni.quotesaver.databinding.FragmentFeedBinding
 import com.hooni.quotesaver.ui.adapter.QuoteFeedAdapter
 import com.hooni.quotesaver.ui.viewmodel.FeedViewModel
+import com.hooni.quotesaver.util.DOUBLE_BACK_TAP_EXIT_INTERVAL
 import org.koin.androidx.viewmodel.ext.android.sharedViewModel
 import kotlin.math.log
 
@@ -35,6 +37,8 @@ class FeedFragment : Fragment() {
 
     private lateinit var binding: FragmentFeedBinding
     private val feedViewModel: FeedViewModel by sharedViewModel()
+    private var backPressedTime: Long = System.currentTimeMillis()
+    private lateinit var backSnackBar: Snackbar
 
     private lateinit var searchTextInputLayout: EditText
     private lateinit var favoritesImageView: ImageView
@@ -54,7 +58,32 @@ class FeedFragment : Fragment() {
     private val displayedQuotes = mutableListOf<Quote>()
     private val favoriteQuotes = mutableListOf<Quote>()
 
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        requireActivity().onBackPressedDispatcher.addCallback(
+            this,
+            object : OnBackPressedCallback(true) {
 
+                override fun handleOnBackPressed() {
+                    exitOnDoubleBackTap()
+                }
+            })
+    }
+
+    private fun exitOnDoubleBackTap() {
+        if (backPressedTime + DOUBLE_BACK_TAP_EXIT_INTERVAL >= System.currentTimeMillis()) {
+            backSnackBar.dismiss()
+            requireActivity().finishAffinity()
+        } else {
+            backPressedTime = System.currentTimeMillis()
+            backSnackBar = Snackbar.make(
+                binding.root,
+                "Press again to exit",
+                Snackbar.LENGTH_SHORT
+            )
+            backSnackBar.show()
+        }
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater,
