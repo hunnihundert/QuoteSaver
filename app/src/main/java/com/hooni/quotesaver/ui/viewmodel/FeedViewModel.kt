@@ -12,7 +12,6 @@ import com.hooni.quotesaver.data.remote.Resource
 import com.hooni.quotesaver.data.remote.Status.*
 import com.hooni.quotesaver.repository.QuoteRepository
 import com.hooni.quotesaver.util.getRandomImage
-import kotlinx.coroutines.flow.onCompletion
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.launch

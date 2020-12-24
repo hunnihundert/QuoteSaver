@@ -10,6 +10,7 @@ import androidx.fragment.app.Fragment
 import com.hooni.quotesaver.data.model.Quote
 import com.hooni.quotesaver.databinding.FragmentFullscreenBinding
 import com.hooni.quotesaver.ui.viewmodel.FeedViewModel
+import com.hooni.quotesaver.util.PicassoTransformationDarken
 import com.squareup.picasso.Picasso
 import org.koin.androidx.viewmodel.ext.android.sharedViewModel
 
@@ -53,6 +54,7 @@ class FullscreenFragment: Fragment() {
     private fun setImage(view: ImageView, resourceId: Int) {
         Picasso.get()
             .load(resourceId)
+            .transform(PicassoTransformationDarken())
             .fit()
             .centerCrop()
             .into(view)
