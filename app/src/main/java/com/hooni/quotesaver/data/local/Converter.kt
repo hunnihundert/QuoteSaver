@@ -3,9 +3,6 @@ package com.hooni.quotesaver.data.local
 import androidx.room.TypeConverter
 
 class Converter {
-    companion object {
-        private const val TAG = "Converter"
-    }
 
     @TypeConverter
     fun convertTagsListToString(tagList: List<String>): String {

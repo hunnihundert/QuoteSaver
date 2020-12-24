@@ -1,6 +1,5 @@
 package com.hooni.quotesaver.ui.viewmodel
 
-import android.util.Log
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.asLiveData
@@ -18,9 +17,6 @@ import kotlinx.coroutines.launch
 
 class FeedViewModel(private val quoteRepository: QuoteRepository) : ViewModel() {
 
-    companion object {
-        private const val TAG = "FeedViewModel"
-    }
 
     sealed class Progress {
         object Idle : Progress()
@@ -31,10 +27,8 @@ class FeedViewModel(private val quoteRepository: QuoteRepository) : ViewModel() 
     internal val progress = MutableLiveData<Progress>(Progress.Idle)
     internal val favoriteQuotes = quoteRepository.getAllFavorites()
         .onStart {
-            Log.d(TAG, "quote repo get all fav loading: ")
             progress.value = Progress.Loading }
         .onEach {
-            Log.d(TAG, "quote repo get all fav done: ")
             progress.value = Progress.Idle }
         .asLiveData()
     internal val apiQueryResponseWithQuotesWithImages = MutableLiveData<Resource<ApiQuoteResult>>()
@@ -51,7 +45,6 @@ class FeedViewModel(private val quoteRepository: QuoteRepository) : ViewModel() 
             val tags = getTags()
             when (tags.status) {
                 LOADING -> {
-                    Log.d(TAG, "loadRandomQuotes: get tags loading")
                     progress.value = Progress.Loading
                 }
                 ERROR -> {
@@ -84,7 +77,6 @@ class FeedViewModel(private val quoteRepository: QuoteRepository) : ViewModel() 
                 quoteRepository.getQuotesByCategory(lastRequestedSearch, nextItems.value)
             when (apiResult.status) {
                 LOADING -> {
-                    Log.d(TAG, "getQuotesByCategory: api result status loading")
                     progress.value = Progress.Loading
                 }
                 ERROR -> {
@@ -138,14 +130,12 @@ class FeedViewModel(private val quoteRepository: QuoteRepository) : ViewModel() 
 
     internal fun addToFavorites(quote: Quote) {
         viewModelScope.launch {
-            Log.d(TAG, "addToFavorites: $quote")
             quoteRepository.addToFavorites(quote)
         }
     }
 
     internal fun removeFromFavorites(quote: Quote) {
         viewModelScope.launch {
-            Log.d(TAG, "removeFromFavorites: $quote")
             quoteRepository.removeFromFavorites(quote)
         }
     }
@@ -167,7 +157,6 @@ class FeedViewModel(private val quoteRepository: QuoteRepository) : ViewModel() 
     }
 
     internal fun addNewItems() {
-        Log.d(TAG, "addNewItems: starting")
         if (nextItems.value != null) getQuotesByCategory()
     }
 
@@ -178,12 +167,10 @@ class FeedViewModel(private val quoteRepository: QuoteRepository) : ViewModel() 
     internal fun getIsNewRequest() = isNewRequest
 
     internal fun setQuote(quote: Quote){
-        Log.d(TAG, "setQuote: $quote")
         fullScreenQuote = quote
     }
 
     internal fun getQuote(): Quote {
-        Log.d(TAG, "getQuote: $fullScreenQuote")
         return fullScreenQuote
     }
 

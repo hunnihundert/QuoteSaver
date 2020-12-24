@@ -19,10 +19,6 @@ class QuoteFeedAdapter(
 ) :
     RecyclerView.Adapter<QuoteFeedAdapter.QuoteViewHolder>() {
 
-    companion object {
-        private const val TAG = "QuoteFeedAdapter"
-    }
-
     inner class QuoteViewHolder(private val binding: ListItemQuoteBinding) :
         RecyclerView.ViewHolder(binding.root) {
 

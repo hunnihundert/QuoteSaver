@@ -3,7 +3,6 @@ package com.hooni.quotesaver.ui.view
 import android.app.Activity
 import android.content.Context
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -29,10 +28,6 @@ import com.hooni.quotesaver.util.DOUBLE_BACK_TAP_EXIT_INTERVAL
 import org.koin.androidx.viewmodel.ext.android.sharedViewModel
 
 class FeedFragment : Fragment() {
-
-    companion object {
-        private const val TAG = "FeedFragment"
-    }
 
     private lateinit var binding: FragmentFeedBinding
     private val feedViewModel: FeedViewModel by sharedViewModel()
@@ -166,6 +161,7 @@ class FeedFragment : Fragment() {
         feedViewModel.apiQueryResponseWithQuotesWithImages.observe(viewLifecycleOwner) { apiResultsQuotes ->
             when(apiResultsQuotes.status) {
                 Status.SUCCESS -> {
+                    loadingView.visibility = View.GONE
                     if (feedViewModel.getIsNewRequest()) {
                         resetRecyclerView()
                         feedViewModel.resetNewRequest()
@@ -175,11 +171,12 @@ class FeedFragment : Fragment() {
                     switchNoResultsTextVisibility(apiResultsQuotes.data.results.isEmpty())
                 }
                 Status.ERROR -> {
+                    loadingView.visibility = View.GONE
                     noResultsTextView.text = getString(R.string.textView_feed_error, apiResultsQuotes.message)
                     noResultsTextView.visibility = View.VISIBLE
                 }
                 Status.LOADING -> {
-                    Log.d(TAG, "quotes, loading: $apiResultsQuotes.status, ${apiResultsQuotes.message}")
+                    loadingView.visibility = View.VISIBLE
                 }
             }
         }

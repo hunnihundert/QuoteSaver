@@ -16,11 +16,6 @@ class QuoteRepository(
     private val responseHandler: ResponseHandler
 ) {
 
-    companion object {
-        private const val TAG = "QuoteRepository"
-    }
-
-
     suspend fun getTags(): Resource<ApiTagResult> {
         return try {
             responseHandler.handleSuccess(quotesApi.getTags())
