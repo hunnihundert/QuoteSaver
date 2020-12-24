@@ -13,10 +13,9 @@
             android:layout_height="40dp"
             android:contentDescription="@string/contentDescription_imageView_favorites_back"
             android:padding="4dp"
-            android:src="@drawable/abc_vector_test"
+            android:src="@drawable/ic_back"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            app:tint="@color/black" />
+            app:layout_constraintTop_toTopOf="parent"/>
 
         <TextView
             android:id="@+id/textView_favorites_noFavorites"
