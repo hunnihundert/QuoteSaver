@@ -5,6 +5,8 @@ import com.hooni.quotesaver.R
 const val NUMBER_OF_QUOTES_RETURNED_AT_ONCE = 30
 const val SOCKET_TIMEOUT_EXCEPTION = 520
 
+const val DOUBLE_BACK_TAP_EXIT_INTERVAL = 2000
+
 val backgroundImages = listOf(
     R.drawable.background_1,
     R.drawable.background_2,

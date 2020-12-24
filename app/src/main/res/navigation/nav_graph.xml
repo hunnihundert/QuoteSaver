@@ -14,7 +14,8 @@
             android:id="@+id/action_feedFragment_to_favoritesFragment"
             app:destination="@id/FavoritesFragment"
             app:enterAnim="@anim/slide_in_right"
-            app:exitAnim="@anim/slide_out_left" />
+            app:exitAnim="@anim/slide_out_left"
+            app:popUpTo="@id/feedFragment"/>
         <action
             android:id="@+id/action_feedFragment_to_fullscreenFragment"
             app:destination="@id/fullscreenFragment"
@@ -30,7 +31,9 @@
             android:id="@+id/action_favoritesFragment_to_feedFragment"
             app:destination="@id/feedFragment"
             app:enterAnim="@anim/slide_in_left"
-            app:exitAnim="@anim/slide_out_right" />
+            app:exitAnim="@anim/slide_out_right"
+            app:popUpTo="@id/feedFragment"
+            app:launchSingleTop="true"/>
         <action
             android:id="@+id/action_favoritesFragment_to_fullscreenFragment"
             app:destination="@id/fullscreenFragment"
@@ -46,7 +49,9 @@
             android:id="@+id/action_fullscreenFragment_to_feedFragment"
             app:destination="@+id/feedFragment"
             app:enterAnim="@anim/fragment_fade_enter"
-            app:exitAnim="@anim/fragment_fade_exit"/>
+            app:exitAnim="@anim/fragment_fade_exit"
+            app:popUpTo="@id/feedFragment"
+            app:launchSingleTop="true"/>
         <action
             android:id="@+id/action_fullscreenFragment_to_FavoritesFragment"
             app:destination="@+id/FavoritesFragment"
