@@ -10,6 +10,8 @@ buildscript {
     ext.coroutines_version = "1.4.2"
     ext.nav_version = "2.3.2"
     ext.picasso_version = "2.71828"
+    ext.picasso_trans_version = "2.4.0"
+    ext.gpuimage_version = "2.1.0"
     repositories {
         google()
         jcenter()

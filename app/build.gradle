@@ -89,4 +89,6 @@ dependencies {
 
     // Picasso
     implementation "com.squareup.picasso:picasso:$picasso_version"
+    implementation "jp.wasabeef:picasso-transformations:$picasso_trans_version"
+    implementation "jp.co.cyberagent.android:gpuimage:$gpuimage_version"
 }

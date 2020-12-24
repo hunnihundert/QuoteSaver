@@ -45,7 +45,6 @@ class FeedFragment : Fragment() {
         object : RecyclerView.OnScrollListener() {
             override fun onScrollStateChanged(recyclerView: RecyclerView, newState: Int) {
                 super.onScrollStateChanged(recyclerView, newState)
-                Log.d(TAG, "onScrollStateChanged: end of list detected!")
                 if (!feedRecyclerView.canScrollVertically(1) && newState == RecyclerView.SCROLL_STATE_IDLE && feedViewModel.progress.value != FeedViewModel.Progress.Loading) loadNewItems()
             }
         }
@@ -116,13 +115,11 @@ class FeedFragment : Fragment() {
 
     private fun initRecyclerView() {
         val favoriteStatusChanger: (Quote) -> Unit = { quote ->
-            Log.d(TAG, "favoriteClickListener: contains: ${favoriteQuotes.contains(quote)}")
             if (favoriteQuotes.contains(quote)) feedViewModel.removeFromFavorites(quote)
             else feedViewModel.addToFavorites(quote)
         }
         val fullscreenOpener: (Quote) -> Unit = { quote ->
             feedViewModel.setQuote(quote)
-            Log.d(TAG, "fullscreenOpener: $quote")
             findNavController().navigate(FeedFragmentDirections.actionFeedFragmentToFullscreenFragment())
         }
         feedAdapter = QuoteFeedAdapter(displayedQuotes, favoriteQuotes, favoriteStatusChanger, fullscreenOpener)
@@ -140,7 +137,7 @@ class FeedFragment : Fragment() {
         feedViewModel.apiQueryResponseWithQuotesWithImages.observe(viewLifecycleOwner) { apiResultsQuotes ->
             when(apiResultsQuotes.status) {
                 Status.SUCCESS -> {
-                    if(feedViewModel.getIsNewRequest()) {
+                    if (feedViewModel.getIsNewRequest()) {
                         resetRecyclerView()
                         feedViewModel.resetNewRequest()
                     }
@@ -149,7 +146,6 @@ class FeedFragment : Fragment() {
                     switchNoResultsTextVisibility(apiResultsQuotes.data.results.isEmpty())
                 }
                 Status.ERROR -> {
-                    Log.d(TAG, "quotes, error: ${apiResultsQuotes.status}, ${apiResultsQuotes.message}")
                     noResultsTextView.text = getString(R.string.textView_feed_error, apiResultsQuotes.message)
                     noResultsTextView.visibility = View.VISIBLE
                 }
@@ -159,20 +155,16 @@ class FeedFragment : Fragment() {
             }
         }
         feedViewModel.progress.observe(viewLifecycleOwner) { progress ->
-            Log.d(TAG, "initObserver: observe progress")
             when(progress) {
                 is FeedViewModel.Progress.Loading -> {
-                    Log.d(TAG, "progress: loading")
                     loadingView.visibility = View.VISIBLE
                 }
                 is FeedViewModel.Progress.Error -> {
-                    Log.d(TAG, "progress: error")
                     loadingView.visibility = View.GONE
                     progress.message
                     showError(progress.message)
                 }
                 is FeedViewModel.Progress.Idle -> {
-                    Log.d(TAG, "progress: idle")
                     loadingView.visibility = View.GONE
                 }
             }
@@ -222,7 +214,6 @@ class FeedFragment : Fragment() {
 
 
     private fun loadNewItems() {
-        Log.d(TAG, "loadNewItems: loading new items!")
         feedViewModel.addNewItems()
     }
 
