@@ -78,7 +78,7 @@ class FavoritesFragment: Fragment() {
             else feedViewModel.addToFavorites(quote)
         }
         val fullscreenOpener: (Quote) -> Unit = { quote ->
-            feedViewModel.setQuote(quote)
+            feedViewModel.setFullscreenQuote(quote)
             findNavController().navigate(FavoritesFragmentDirections.actionFavoritesFragmentToFullscreenFragment())
         }
 

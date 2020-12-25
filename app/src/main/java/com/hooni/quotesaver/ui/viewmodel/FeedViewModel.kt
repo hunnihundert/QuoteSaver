@@ -25,18 +25,23 @@ class FeedViewModel(private val quoteRepository: QuoteRepository) : ViewModel() 
     }
 
     internal val progress = MutableLiveData<Progress>(Progress.Idle)
+
+    internal val quoteResultWithImages = MutableLiveData<ApiQuoteResult>()
     internal val favoriteQuotes = quoteRepository.getAllFavorites()
         .onStart {
             progress.value = Progress.Loading }
         .onEach {
             progress.value = Progress.Idle }
         .asLiveData()
-    internal val apiQueryResponseWithQuotesWithImages = MutableLiveData<Resource<ApiQuoteResult>>()
-    val searchTerm = MutableLiveData("")
+
+    val currentSearchTerm = MutableLiveData("")
     internal var lastRequestedSearch = ""
+
     private var isNewRequest = true
+
     private val nextItems = MutableLiveData<String?>()
     private val previousItems = MutableLiveData<String?>()
+
     private lateinit var fullScreenQuote: Quote
 
 
@@ -48,7 +53,6 @@ class FeedViewModel(private val quoteRepository: QuoteRepository) : ViewModel() 
                     progress.value = Progress.Loading
                 }
                 ERROR -> {
-                    progress.value = Progress.Idle
                     progress.value = Progress.Error(tags.message ?: "Unknown Error")
                 }
                 SUCCESS -> {
@@ -65,8 +69,8 @@ class FeedViewModel(private val quoteRepository: QuoteRepository) : ViewModel() 
 
     private fun setRandomCategory(categories: List<ApiTagResult.QuoteTags>) {
         val randomCategory = categories.random().name
-        searchTerm.value = randomCategory
-        lastRequestedSearch = searchTerm.value!!
+        currentSearchTerm.value = randomCategory
+        lastRequestedSearch = currentSearchTerm.value!!
         getQuotesByCategory()
     }
 
@@ -80,18 +84,19 @@ class FeedViewModel(private val quoteRepository: QuoteRepository) : ViewModel() 
                     progress.value = Progress.Loading
                 }
                 ERROR -> {
-                    progress.value = Progress.Idle
                     progress.value = Progress.Error(apiResult.message ?: "Unknown Error")
                 }
                 SUCCESS -> {
                     progress.value = Progress.Idle
-                    apiQueryResponseWithQuotesWithImages.value = addImageToQuotes(apiResult)
+                    if(isNewRequest) quoteResultWithImages.value = addImageToQuotes(apiResult)
+                    else quoteResultWithImages.value = addNewApiResultToCurrent(apiResult)
+
                 }
             }
         }
     }
 
-    private fun addImageToQuotes(apiResult: Resource<ApiQuoteResult>): Resource<ApiQuoteResult> {
+    private fun addImageToQuotes(apiResult: Resource<ApiQuoteResult>): ApiQuoteResult {
         setNextPreviousItems(apiResult)
         return createQuotesWithImages(apiResult)
     }
@@ -101,7 +106,7 @@ class FeedViewModel(private val quoteRepository: QuoteRepository) : ViewModel() 
         previousItems.value = apiQueryResponse.data.previous
     }
 
-    private fun createQuotesWithImages(apiQueryResponse: Resource<ApiQuoteResult>): Resource<ApiQuoteResult> {
+    private fun createQuotesWithImages(apiQueryResponse: Resource<ApiQuoteResult>): ApiQuoteResult {
         val quotesWithImages = mutableListOf<Quote>()
         apiQueryResponse.data!!.results.forEach { quote ->
             quotesWithImages.add(
@@ -116,16 +121,18 @@ class FeedViewModel(private val quoteRepository: QuoteRepository) : ViewModel() 
                 )
             )
         }
-        val apiQuoteResultsWithImages = ApiQuoteResult(
+        return ApiQuoteResult(
             apiQueryResponse.data.next,
             apiQueryResponse.data.previous,
-            quotesWithImages
-        )
-        return Resource(
-            apiQueryResponse.status,
-            apiQuoteResultsWithImages,
-            apiQueryResponse.message
-        )
+            quotesWithImages)
+    }
+
+    private fun addNewApiResultToCurrent(apiResult: Resource<ApiQuoteResult>): ApiQuoteResult {
+        return ApiQuoteResult(
+            quoteResultWithImages.value!!.next,
+            quoteResultWithImages.value!!.previous,
+            quoteResultWithImages.value!!.results
+                    + addImageToQuotes(apiResult).results)
     }
 
     internal fun addToFavorites(quote: Quote) {
@@ -141,11 +148,11 @@ class FeedViewModel(private val quoteRepository: QuoteRepository) : ViewModel() 
     }
 
     internal fun startNewRequest() {
-        if (searchTerm.value.isNullOrBlank()) {
+        if (currentSearchTerm.value.isNullOrBlank()) {
             // empty search
         } else {
             resetRequestParameters()
-            lastRequestedSearch = searchTerm.value!!
+            lastRequestedSearch = currentSearchTerm.value!!
             getQuotesByCategory()
         }
     }
@@ -160,17 +167,17 @@ class FeedViewModel(private val quoteRepository: QuoteRepository) : ViewModel() 
         if (nextItems.value != null) getQuotesByCategory()
     }
 
-    internal fun resetNewRequest() {
+    internal fun resetIsNewRequest() {
         isNewRequest = false
     }
 
     internal fun getIsNewRequest() = isNewRequest
 
-    internal fun setQuote(quote: Quote){
+    internal fun setFullscreenQuote(quote: Quote){
         fullScreenQuote = quote
     }
 
-    internal fun getQuote(): Quote {
+    internal fun getFullscreenQuote(): Quote {
         return fullScreenQuote
     }
 

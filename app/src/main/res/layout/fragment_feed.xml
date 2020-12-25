@@ -40,7 +40,7 @@
                     android:imeOptions="actionSearch"
                     android:inputType="text"
                     android:paddingHorizontal="12dp"
-                    android:text="@={feedViewModel.searchTerm}"
+                    android:text="@={feedViewModel.currentSearchTerm}"
                     tools:textColor="@color/black" />
 
                 <ImageView
