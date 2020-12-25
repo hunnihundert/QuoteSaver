@@ -38,7 +38,7 @@ class FullscreenFragment: Fragment() {
     }
 
     private fun setQuote() {
-        quote = feedViewModel.getQuote()
+        quote = feedViewModel.getFullscreenQuote()
     }
 
     private fun initUI() {

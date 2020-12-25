@@ -3,6 +3,7 @@ package com.hooni.quotesaver.ui.view
 import android.app.Activity
 import android.content.Context
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -20,7 +21,6 @@ import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.snackbar.Snackbar
 import com.hooni.quotesaver.R
 import com.hooni.quotesaver.data.model.Quote
-import com.hooni.quotesaver.data.remote.Status
 import com.hooni.quotesaver.databinding.FragmentFeedBinding
 import com.hooni.quotesaver.ui.adapter.QuoteFeedAdapter
 import com.hooni.quotesaver.ui.viewmodel.FeedViewModel
@@ -28,6 +28,8 @@ import com.hooni.quotesaver.util.DOUBLE_BACK_TAP_EXIT_INTERVAL
 import org.koin.androidx.viewmodel.ext.android.sharedViewModel
 
 class FeedFragment : Fragment() {
+
+    private val TAG = "FeedFragment"
 
     private lateinit var binding: FragmentFeedBinding
     private val feedViewModel: FeedViewModel by sharedViewModel()
@@ -40,13 +42,6 @@ class FeedFragment : Fragment() {
     private lateinit var noResultsTextView: TextView
     private lateinit var feedRecyclerView: RecyclerView
     private lateinit var feedAdapter: QuoteFeedAdapter
-    private val endOfListDetector: RecyclerView.OnScrollListener =
-        object : RecyclerView.OnScrollListener() {
-            override fun onScrollStateChanged(recyclerView: RecyclerView, newState: Int) {
-                super.onScrollStateChanged(recyclerView, newState)
-                if (!feedRecyclerView.canScrollVertically(1) && newState == RecyclerView.SCROLL_STATE_IDLE && feedViewModel.progress.value != FeedViewModel.Progress.Loading) loadNewItems()
-            }
-        }
 
     private val displayedQuotes = mutableListOf<Quote>()
     private val favoriteQuotes = mutableListOf<Quote>()
@@ -56,7 +51,6 @@ class FeedFragment : Fragment() {
         requireActivity().onBackPressedDispatcher.addCallback(
             this,
             object : OnBackPressedCallback(true) {
-
                 override fun handleOnBackPressed() {
                     exitOnDoubleBackTap()
                 }
@@ -143,10 +137,25 @@ class FeedFragment : Fragment() {
             else feedViewModel.addToFavorites(quote)
         }
         val fullscreenOpener: (Quote) -> Unit = { quote ->
-            feedViewModel.setQuote(quote)
+            feedViewModel.setFullscreenQuote(quote)
             findNavController().navigate(FeedFragmentDirections.actionFeedFragmentToFullscreenFragment())
         }
-        feedAdapter = QuoteFeedAdapter(displayedQuotes, favoriteQuotes, favoriteStatusChanger, fullscreenOpener)
+        val endOfListDetector: RecyclerView.OnScrollListener =
+            object : RecyclerView.OnScrollListener() {
+                override fun onScrollStateChanged(recyclerView: RecyclerView, newState: Int) {
+                    super.onScrollStateChanged(recyclerView, newState)
+                    if (!feedRecyclerView.canScrollVertically(1) &&
+                        newState == RecyclerView.SCROLL_STATE_IDLE &&
+                        feedViewModel.progress.value != FeedViewModel.Progress.Loading
+                    ) loadNewItems()
+                }
+            }
+        feedAdapter = QuoteFeedAdapter(
+            displayedQuotes,
+            favoriteQuotes,
+            favoriteStatusChanger,
+            fullscreenOpener
+        )
         feedRecyclerView = binding.recyclerViewFeedQuoteFeed
         feedRecyclerView.layoutManager = LinearLayoutManager(requireContext())
         feedRecyclerView.adapter = feedAdapter
@@ -158,30 +167,22 @@ class FeedFragment : Fragment() {
         feedViewModel.favoriteQuotes.observe(viewLifecycleOwner) { favoriteQuoteList ->
             updateFavoriteQuotes(favoriteQuoteList)
         }
-        feedViewModel.apiQueryResponseWithQuotesWithImages.observe(viewLifecycleOwner) { apiResultsQuotes ->
-            when(apiResultsQuotes.status) {
-                Status.SUCCESS -> {
-                    loadingView.visibility = View.GONE
-                    if (feedViewModel.getIsNewRequest()) {
-                        resetRecyclerView()
-                        feedViewModel.resetNewRequest()
-                    }
-                    updateRecyclerView(apiResultsQuotes.data!!.results)
-                    moveEditTextCursorToEnd()
-                    switchNoResultsTextVisibility(apiResultsQuotes.data.results.isEmpty())
-                }
-                Status.ERROR -> {
-                    loadingView.visibility = View.GONE
-                    noResultsTextView.text = getString(R.string.textView_feed_error, apiResultsQuotes.message)
-                    noResultsTextView.visibility = View.VISIBLE
-                }
-                Status.LOADING -> {
-                    loadingView.visibility = View.VISIBLE
-                }
+
+        feedViewModel.quoteResultWithImages.observe(viewLifecycleOwner) { quoteResultWithImages ->
+            Log.d(TAG, "apiQueryResponseWithQuotesWithImages: success")
+            loadingView.visibility = View.GONE
+            if (feedViewModel.getIsNewRequest()) {
+                feedRecyclerView.scrollToPosition(0)
+                feedViewModel.resetIsNewRequest()
             }
+            Log.d(TAG, "apiQueryResponseWithQuotesWithImages: $quoteResultWithImages")
+            updateRecyclerView(quoteResultWithImages.results)
+            moveEditTextCursorToEnd()
+            switchNoResultsTextVisibility(quoteResultWithImages.results.isEmpty())
         }
+
         feedViewModel.progress.observe(viewLifecycleOwner) { progress ->
-            when(progress) {
+            when (progress) {
                 is FeedViewModel.Progress.Loading -> {
                     loadingView.visibility = View.VISIBLE
                 }
@@ -201,17 +202,15 @@ class FeedFragment : Fragment() {
         val errorMessage = getString(R.string.textView_feed_error, message ?: "Unknown Error")
         noResultsTextView.text = errorMessage
         noResultsTextView.visibility = View.VISIBLE
-        val snackBar = Snackbar.make(binding.root,errorMessage,Snackbar.LENGTH_SHORT)
+        val snackBar = Snackbar.make(binding.root, errorMessage, Snackbar.LENGTH_SHORT)
         snackBar.show()
     }
 
-    private fun resetRecyclerView() {
-        feedRecyclerView.scrollToPosition(0)
-        displayedQuotes.clear()
-    }
-
     private fun updateRecyclerView(quoteList: List<Quote>) {
+        Log.d(TAG, "updateRecyclerView: $displayedQuotes")
+        displayedQuotes.clear()
         displayedQuotes.addAll(quoteList)
+        Log.d(TAG, "updateRecyclerView: after: $displayedQuotes")
         feedAdapter.notifyDataSetChanged()
     }
 
@@ -220,11 +219,10 @@ class FeedFragment : Fragment() {
     }
 
     private fun switchNoResultsTextVisibility(listIsEmpty: Boolean) {
-        if(listIsEmpty) {
+        if (listIsEmpty) {
             noResultsTextView.visibility = View.VISIBLE
             noResultsTextView.text = getString(R.string.textView_feed_noResults)
-        }
-        else noResultsTextView.visibility = View.GONE
+        } else noResultsTextView.visibility = View.GONE
     }
 
     private fun updateFavoriteQuotes(favoriteQuoteList: List<Quote>) {
@@ -235,7 +233,7 @@ class FeedFragment : Fragment() {
 
 
     private fun loadRandomQuotes() {
-        if(feedViewModel.lastRequestedSearch.isEmpty()) feedViewModel.loadRandomQuotes()
+        if (feedViewModel.lastRequestedSearch.isEmpty()) feedViewModel.loadRandomQuotes()
     }
 
 
@@ -245,11 +243,12 @@ class FeedFragment : Fragment() {
 
 
     private fun Fragment.hideKeyboard() {
-        view?.let {activity?.hideKeyboard(it)}
+        view?.let { activity?.hideKeyboard(it) }
     }
 
     private fun Context.hideKeyboard(view: View) {
-        val inputMethodManager = getSystemService(Activity.INPUT_METHOD_SERVICE) as InputMethodManager
+        val inputMethodManager =
+            getSystemService(Activity.INPUT_METHOD_SERVICE) as InputMethodManager
         inputMethodManager.hideSoftInputFromWindow(view.windowToken, 0)
     }
 }
