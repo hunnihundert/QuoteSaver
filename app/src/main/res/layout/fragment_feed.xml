@@ -24,7 +24,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal"
-                android:padding="4dp"
+                android:padding="@dimen/padding_feed_editTextSearch"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent">
@@ -32,14 +32,14 @@
                 <com.google.android.material.textfield.TextInputEditText
                     android:id="@+id/editText_feed_search"
                     android:layout_width="0dp"
-                    android:layout_height="40dp"
+                    android:layout_height="@dimen/editTextHeight_feed_searchField"
                     android:layout_weight="8"
                     android:background="@drawable/shape_edittext_rounded"
                     android:drawableEnd="?android:attr/actionModeWebSearchDrawable"
                     android:hint="@string/hint_textInputEditText_feed_search"
                     android:imeOptions="actionSearch"
                     android:inputType="text"
-                    android:paddingHorizontal="12dp"
+                    android:paddingHorizontal="@dimen/horizontalPadding_feed_searchField"
                     android:text="@={feedViewModel.currentSearchTerm}"
                     tools:textColor="@color/black" />
 
@@ -58,19 +58,19 @@
                 android:id="@+id/recyclerView_feed_quoteFeed"
                 android:layout_width="match_parent"
                 android:layout_height="0dp"
-                android:paddingHorizontal="4dp"
+                android:paddingHorizontal="@dimen/horizontalPadding_feed_recyclerView"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@id/linearLayout_feed_search"
                 tools:itemCount="4"
-                tools:listitem="@layout/list_item_quote"/>
+                tools:listitem="@layout/list_item_quote" />
 
             <LinearLayout
                 android:id="@+id/linearLayout_feed_loading"
                 android:layout_width="match_parent"
                 android:layout_height="0dp"
-                android:background="#AACCCCCC"
+                android:background="@color/transparent_grey"
                 android:gravity="center"
                 android:visibility="gone"
                 app:layout_constraintBottom_toBottomOf="parent"

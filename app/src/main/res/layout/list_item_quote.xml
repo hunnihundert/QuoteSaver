@@ -5,13 +5,13 @@
 
     <androidx.cardview.widget.CardView
         android:layout_width="match_parent"
-        android:layout_height="200dp"
-        android:layout_margin="4dp"
+        android:layout_height="@dimen/cardViewHeight_listItem"
+        android:layout_margin="@dimen/margin_listItem_cardView"
         android:clipToPadding="true"
-        app:cardBackgroundColor="#333333"
-        app:cardCornerRadius="12dp"
-        app:cardElevation="4dp"
-        app:cardMaxElevation="4dp">
+        app:cardBackgroundColor="@color/dark_grey"
+        app:cardCornerRadius="@dimen/cardCornerRadius_listItem_cardView"
+        app:cardElevation="@dimen/cardElevation_listItem_cardView"
+        app:cardMaxElevation="@dimen/cardMaxElevation_listItem_cardView">
 
         <ImageView
             android:id="@+id/imageView_listItemQuote_backgroundImage"
@@ -23,38 +23,35 @@
             android:id="@+id/textView_listItemQuote_quote"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:layout_marginTop="12dp"
-            android:layout_marginHorizontal="12dp"
-            android:layout_marginBottom="24dp"
-            android:gravity="center"
-            android:textColor="#FFFFDD"
-            android:textSize="24sp"
-            android:maxLines="5"
+            android:layout_marginHorizontal="@dimen/marginHorizontal_listItem"
+            android:layout_marginTop="@dimen/marginTop_listItem"
+            android:layout_marginBottom="@dimen/marginBottom_listItem"
             android:ellipsize="end"
-            tools:text="Whether you think you can or you cannot, you are always right."
-            tools:ellipsize="end"
-            tools:maxLines="5"
-            tools:textSize="32sp" />
+            android:gravity="center"
+            android:maxLines="5"
+            android:textColor="@color/darkish_white"
+            android:textSize="@dimen/textSize_listItem_quote"
+            tools:text="Whether you think you can or you cannot, you are always right." />
 
         <ImageView
             android:id="@+id/imageView_listItemQuote_favorite"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="bottom|end"
-            android:layout_margin="12dp"
+            android:layout_margin="@dimen/margin_listItem_icons"
             android:contentDescription="@string/contentDescription_imageView_listItemQuote_favorite"
             android:src="@drawable/ic_favorite_border"
-            app:tint="#FFFFDD" />
+            app:tint="@color/darkish_white" />
 
         <ImageView
             android:id="@+id/imageView_listItemQuote_share"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="bottom|start"
-            android:layout_margin="12dp"
+            android:layout_margin="@dimen/margin_listItem_icons"
             android:contentDescription="@string/contentDescription_imageView_listItemQuote_share"
             android:src="@drawable/ic_share"
-            app:tint="#FFFFDD" />
+            app:tint="@color/darkish_white" />
 
     </androidx.cardview.widget.CardView>
 </layout>

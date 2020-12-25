@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <dimen name="editTextHeight_feed_searchField">40dp</dimen>
+    <dimen name="padding_feed_editTextSearch">4dp</dimen>
+    <dimen name="horizontalPadding_feed_searchField">12dp</dimen>
+    <dimen name="horizontalPadding_feed_recyclerView">4dp</dimen>
+    <dimen name="cardCornerRadius_listItem_cardView">12dp</dimen>
+
+    <dimen name="imageViewHeight_favorites_back">40dp</dimen>
+    <dimen name="padding_favorites">4dp</dimen>
+
+    <dimen name="textSize_fullscreen_quote">28sp</dimen>
+    <dimen name="padding_fullscreen">12dp</dimen>
+
+    <dimen name="cardElevation_listItem_cardView">4dp</dimen>
+    <dimen name="cardMaxElevation_listItem_cardView">4dp</dimen>
+    <dimen name="textSize_listItem_quote">24sp</dimen>
+    <dimen name="marginTop_listItem">12dp</dimen>
+    <dimen name="marginHorizontal_listItem">12dp</dimen>
+    <dimen name="marginBottom_listItem">24dp</dimen>
+    <dimen name="margin_listItem_icons">12dp</dimen>
+    <dimen name="cardViewHeight_listItem">200dp</dimen>
+    <dimen name="margin_listItem_cardView">4dp</dimen>
+</resources>
