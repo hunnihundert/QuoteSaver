@@ -3,6 +3,7 @@ package com.hooni.quotesaver.ui.view
 import android.app.Activity
 import android.content.Context
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -28,6 +29,10 @@ import com.hooni.quotesaver.util.DOUBLE_BACK_TAP_EXIT_INTERVAL
 import org.koin.androidx.viewmodel.ext.android.sharedViewModel
 
 class FeedFragment : Fragment() {
+
+    private val TAG = "FeedFragment"
+    private val KEY_RECYCLERVIEW_STATE = "recyclerview state"
+
 
     private lateinit var binding: FragmentFeedBinding
     private val feedViewModel: FeedViewModel by sharedViewModel()
@@ -89,6 +94,32 @@ class FeedFragment : Fragment() {
         return binding.root
     }
 
+    override fun onPause() {
+        super.onPause()
+        saveRecyclerViewState()
+    }
+
+    private fun saveRecyclerViewState() {
+        feedViewModel.feedRecyclerViewState = feedRecyclerView.layoutManager?.onSaveInstanceState()
+        feedViewModel.feedRecyclerViewStateBundle = Bundle()
+        feedViewModel.feedRecyclerViewStateBundle!!.putParcelable(
+            KEY_RECYCLERVIEW_STATE,
+            feedViewModel.feedRecyclerViewState
+        )
+    }
+
+    override fun onResume() {
+        super.onResume()
+        loadRecyclerViewState()
+    }
+
+    private fun loadRecyclerViewState() {
+        feedViewModel.feedRecyclerViewStateBundle?.let {
+            feedViewModel.feedRecyclerViewState = it.getParcelable(KEY_RECYCLERVIEW_STATE)
+            feedRecyclerView.layoutManager?.onRestoreInstanceState(feedViewModel.feedRecyclerViewState)
+        }
+    }
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         initUi()
         initObserver()
@@ -138,6 +169,7 @@ class FeedFragment : Fragment() {
     }
 
     private fun initRecyclerView() {
+        Log.d(TAG, "initRecyclerView: ")
         val favoriteStatusChanger: (Quote) -> Unit = { quote ->
             if (favoriteQuotes.contains(quote)) feedViewModel.removeFromFavorites(quote)
             else feedViewModel.addToFavorites(quote)
@@ -146,7 +178,12 @@ class FeedFragment : Fragment() {
             feedViewModel.setQuote(quote)
             findNavController().navigate(FeedFragmentDirections.actionFeedFragmentToFullscreenFragment())
         }
-        feedAdapter = QuoteFeedAdapter(displayedQuotes, favoriteQuotes, favoriteStatusChanger, fullscreenOpener)
+        feedAdapter = QuoteFeedAdapter(
+            displayedQuotes,
+            favoriteQuotes,
+            favoriteStatusChanger,
+            fullscreenOpener
+        )
         feedRecyclerView = binding.recyclerViewFeedQuoteFeed
         feedRecyclerView.layoutManager = LinearLayoutManager(requireContext())
         feedRecyclerView.adapter = feedAdapter
@@ -159,7 +196,7 @@ class FeedFragment : Fragment() {
             updateFavoriteQuotes(favoriteQuoteList)
         }
         feedViewModel.apiQueryResponseWithQuotesWithImages.observe(viewLifecycleOwner) { apiResultsQuotes ->
-            when(apiResultsQuotes.status) {
+            when (apiResultsQuotes.status) {
                 Status.SUCCESS -> {
                     loadingView.visibility = View.GONE
                     if (feedViewModel.getIsNewRequest()) {
@@ -172,7 +209,8 @@ class FeedFragment : Fragment() {
                 }
                 Status.ERROR -> {
                     loadingView.visibility = View.GONE
-                    noResultsTextView.text = getString(R.string.textView_feed_error, apiResultsQuotes.message)
+                    noResultsTextView.text =
+                        getString(R.string.textView_feed_error, apiResultsQuotes.message)
                     noResultsTextView.visibility = View.VISIBLE
                 }
                 Status.LOADING -> {
@@ -181,7 +219,7 @@ class FeedFragment : Fragment() {
             }
         }
         feedViewModel.progress.observe(viewLifecycleOwner) { progress ->
-            when(progress) {
+            when (progress) {
                 is FeedViewModel.Progress.Loading -> {
                     loadingView.visibility = View.VISIBLE
                 }
@@ -201,7 +239,7 @@ class FeedFragment : Fragment() {
         val errorMessage = getString(R.string.textView_feed_error, message ?: "Unknown Error")
         noResultsTextView.text = errorMessage
         noResultsTextView.visibility = View.VISIBLE
-        val snackBar = Snackbar.make(binding.root,errorMessage,Snackbar.LENGTH_SHORT)
+        val snackBar = Snackbar.make(binding.root, errorMessage, Snackbar.LENGTH_SHORT)
         snackBar.show()
     }
 
@@ -220,11 +258,10 @@ class FeedFragment : Fragment() {
     }
 
     private fun switchNoResultsTextVisibility(listIsEmpty: Boolean) {
-        if(listIsEmpty) {
+        if (listIsEmpty) {
             noResultsTextView.visibility = View.VISIBLE
             noResultsTextView.text = getString(R.string.textView_feed_noResults)
-        }
-        else noResultsTextView.visibility = View.GONE
+        } else noResultsTextView.visibility = View.GONE
     }
 
     private fun updateFavoriteQuotes(favoriteQuoteList: List<Quote>) {
@@ -235,7 +272,7 @@ class FeedFragment : Fragment() {
 
 
     private fun loadRandomQuotes() {
-        if(feedViewModel.lastRequestedSearch.isEmpty()) feedViewModel.loadRandomQuotes()
+        if (feedViewModel.lastRequestedSearch.isEmpty()) feedViewModel.loadRandomQuotes()
     }
 
 
@@ -245,11 +282,12 @@ class FeedFragment : Fragment() {
 
 
     private fun Fragment.hideKeyboard() {
-        view?.let {activity?.hideKeyboard(it)}
+        view?.let { activity?.hideKeyboard(it) }
     }
 
     private fun Context.hideKeyboard(view: View) {
-        val inputMethodManager = getSystemService(Activity.INPUT_METHOD_SERVICE) as InputMethodManager
+        val inputMethodManager =
+            getSystemService(Activity.INPUT_METHOD_SERVICE) as InputMethodManager
         inputMethodManager.hideSoftInputFromWindow(view.windowToken, 0)
     }
 }
