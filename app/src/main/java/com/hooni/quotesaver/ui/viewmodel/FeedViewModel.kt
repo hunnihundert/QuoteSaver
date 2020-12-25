@@ -1,5 +1,7 @@
 package com.hooni.quotesaver.ui.viewmodel
 
+import android.os.Bundle
+import android.os.Parcelable
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.asLiveData
@@ -44,6 +46,8 @@ class FeedViewModel(private val quoteRepository: QuoteRepository) : ViewModel() 
 
     private lateinit var fullScreenQuote: Quote
 
+    internal var feedRecyclerViewStateBundle: Bundle? = null
+    internal var feedRecyclerViewState: Parcelable? = null
 
     internal fun loadRandomQuotes() {
         viewModelScope.launch {

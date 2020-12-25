@@ -25,11 +25,10 @@ import com.hooni.quotesaver.databinding.FragmentFeedBinding
 import com.hooni.quotesaver.ui.adapter.QuoteFeedAdapter
 import com.hooni.quotesaver.ui.viewmodel.FeedViewModel
 import com.hooni.quotesaver.util.DOUBLE_BACK_TAP_EXIT_INTERVAL
+import com.hooni.quotesaver.util.KEY_RECYCLERVIEW_STATE
 import org.koin.androidx.viewmodel.ext.android.sharedViewModel
 
 class FeedFragment : Fragment() {
-
-    private val TAG = "FeedFragment"
 
     private lateinit var binding: FragmentFeedBinding
     private val feedViewModel: FeedViewModel by sharedViewModel()
@@ -81,6 +80,32 @@ class FeedFragment : Fragment() {
         binding.feedViewModel = feedViewModel
         binding.lifecycleOwner = viewLifecycleOwner
         return binding.root
+    }
+
+    override fun onPause() {
+        super.onPause()
+        saveRecyclerViewState()
+    }
+
+    private fun saveRecyclerViewState() {
+        feedViewModel.feedRecyclerViewState = feedRecyclerView.layoutManager?.onSaveInstanceState()
+        feedViewModel.feedRecyclerViewStateBundle = Bundle()
+        feedViewModel.feedRecyclerViewStateBundle!!.putParcelable(
+            KEY_RECYCLERVIEW_STATE,
+            feedViewModel.feedRecyclerViewState
+        )
+    }
+
+    override fun onResume() {
+        super.onResume()
+        loadRecyclerViewState()
+    }
+
+    private fun loadRecyclerViewState() {
+        feedViewModel.feedRecyclerViewStateBundle?.let {
+            feedViewModel.feedRecyclerViewState = it.getParcelable(KEY_RECYCLERVIEW_STATE)
+            feedRecyclerView.layoutManager?.onRestoreInstanceState(feedViewModel.feedRecyclerViewState)
+        }
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -150,6 +175,7 @@ class FeedFragment : Fragment() {
                     ) loadNewItems()
                 }
             }
+
         feedAdapter = QuoteFeedAdapter(
             displayedQuotes,
             favoriteQuotes,
@@ -169,13 +195,11 @@ class FeedFragment : Fragment() {
         }
 
         feedViewModel.quoteResultWithImages.observe(viewLifecycleOwner) { quoteResultWithImages ->
-            Log.d(TAG, "apiQueryResponseWithQuotesWithImages: success")
             loadingView.visibility = View.GONE
             if (feedViewModel.getIsNewRequest()) {
                 feedRecyclerView.scrollToPosition(0)
                 feedViewModel.resetIsNewRequest()
             }
-            Log.d(TAG, "apiQueryResponseWithQuotesWithImages: $quoteResultWithImages")
             updateRecyclerView(quoteResultWithImages.results)
             moveEditTextCursorToEnd()
             switchNoResultsTextVisibility(quoteResultWithImages.results.isEmpty())
@@ -207,10 +231,8 @@ class FeedFragment : Fragment() {
     }
 
     private fun updateRecyclerView(quoteList: List<Quote>) {
-        Log.d(TAG, "updateRecyclerView: $displayedQuotes")
         displayedQuotes.clear()
         displayedQuotes.addAll(quoteList)
-        Log.d(TAG, "updateRecyclerView: after: $displayedQuotes")
         feedAdapter.notifyDataSetChanged()
     }
 
