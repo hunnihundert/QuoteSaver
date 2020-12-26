@@ -10,6 +10,9 @@ local.properties
 
 # Gradle generated files
 .gradle/
+build.gradle
+gradle.properties
+.app/build.gradle
 
 # Signing files
 .signing/
