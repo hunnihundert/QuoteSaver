@@ -9,7 +9,7 @@ class AuthInterceptor: Interceptor {
         val request = chain
             .request()
             .newBuilder()
-            .header("Authorization", "Token ${BuildConfig.API_KEY}")
+            .header("Authorization", "Token ${BuildConfig.API_URL_QUERY}")
             .build()
         return chain.proceed(request)
     }
