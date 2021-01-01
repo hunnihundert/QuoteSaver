@@ -1,15 +1,8 @@
 package com.hooni.quotesaver.ui.view
 
-import android.app.Activity
-import android.content.Context
 import android.os.Bundle
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
+import android.view.*
 import android.view.inputmethod.EditorInfo
-import android.view.inputmethod.InputMethodManager
-import android.widget.EditText
-import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.activity.OnBackPressedCallback
@@ -25,6 +18,8 @@ import com.hooni.quotesaver.ui.adapter.QuoteFeedAdapter
 import com.hooni.quotesaver.ui.viewmodel.FeedViewModel
 import com.hooni.quotesaver.util.DOUBLE_BACK_TAP_EXIT_INTERVAL
 import com.hooni.quotesaver.util.KEY_RECYCLERVIEW_STATE
+import com.hooni.quotesaver.util.TextInputEditTextWithClickableDrawable
+import com.hooni.quotesaver.util.hideKeyboard
 import org.koin.androidx.viewmodel.ext.android.sharedViewModel
 
 class FeedFragment : Fragment() {
@@ -34,8 +29,7 @@ class FeedFragment : Fragment() {
     private var backPressedTime: Long = System.currentTimeMillis()
     private lateinit var backSnackBar: Snackbar
 
-    private lateinit var searchTextInputLayout: EditText
-    private lateinit var favoritesImageView: ImageView
+    private lateinit var searchTextInputLayout: TextInputEditTextWithClickableDrawable
     private lateinit var loadingView: LinearLayout
     private lateinit var noResultsTextView: TextView
     private lateinit var feedRecyclerView: RecyclerView
@@ -115,20 +109,19 @@ class FeedFragment : Fragment() {
 
 
     private fun initUi() {
-        initSearchTextInput()
-        initImageView()
+        initSearchLayout()
         initLoadingView()
         initErrorTextView()
         initRecyclerView()
     }
 
-    private fun initSearchTextInput() {
+    private fun initSearchLayout() {
         searchTextInputLayout = binding.editTextFeedSearch
         searchTextInputLayout.setOnEditorActionListener { _, actionId, _ ->
             when (actionId) {
                 EditorInfo.IME_ACTION_SEARCH, EditorInfo.IME_ACTION_DONE, EditorInfo.IME_ACTION_GO, EditorInfo.IME_ACTION_SEND -> {
                     feedViewModel.startNewRequest()
-                    hideKeyboard()
+                    hideKeyboard(requireContext(), binding.root)
                     true
                 }
                 else -> {
@@ -136,11 +129,7 @@ class FeedFragment : Fragment() {
                 }
             }
         }
-    }
-
-    private fun initImageView() {
-        favoritesImageView = binding.imageViewFeedFavorites
-        favoritesImageView.setOnClickListener {
+        searchTextInputLayout.setNavigationPoint {
             findNavController().navigate(FeedFragmentDirections.actionFeedFragmentToFavoritesFragment())
         }
     }
@@ -260,16 +249,5 @@ class FeedFragment : Fragment() {
 
     private fun loadNewItems() {
         feedViewModel.addNewItems()
-    }
-
-
-    private fun Fragment.hideKeyboard() {
-        view?.let { activity?.hideKeyboard(it) }
-    }
-
-    private fun Context.hideKeyboard(view: View) {
-        val inputMethodManager =
-            getSystemService(Activity.INPUT_METHOD_SERVICE) as InputMethodManager
-        inputMethodManager.hideSoftInputFromWindow(view.windowToken, 0)
     }
 }

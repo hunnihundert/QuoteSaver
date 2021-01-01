@@ -10,93 +10,81 @@
             type="com.hooni.quotesaver.ui.viewmodel.FeedViewModel" />
     </data>
 
+
     <androidx.coordinatorlayout.widget.CoordinatorLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="match_parent"
+        android:background="@android:color/transparent"
+        android:orientation="vertical">
 
-
-        <androidx.constraintlayout.widget.ConstraintLayout
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/recyclerView_feed_quoteFeed"
             android:layout_width="match_parent"
-            android:layout_height="match_parent">
+            android:layout_height="match_parent"
+            android:paddingHorizontal="@dimen/horizontalPadding_feed_recyclerView"
+            tools:itemCount="4"
+            tools:listitem="@layout/list_item_quote" />
 
-            <LinearLayout
-                android:id="@+id/linearLayout_feed_search"
+        <com.google.android.material.appbar.AppBarLayout
+            android:id="@+id/appBarLayout_feed"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@android:color/transparent"
+            app:elevation="0dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent">
+
+            <androidx.appcompat.widget.Toolbar
+                android:id="@+id/toolbar_feed"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:padding="@dimen/padding_feed_editTextSearch"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent">
+                android:layout_height="?attr/actionBarSize"
+                android:layout_marginHorizontal="@dimen/marginHorizontal_feed_toolbar"
+                android:layout_marginVertical="@dimen/marginVertical_feed_toolbar"
+                android:background="@drawable/shape_edittext_rounded"
+                android:elevation="@dimen/elevation_feed_toolbar"
+                app:layout_scrollFlags="scroll|enterAlways">
 
-                <com.google.android.material.textfield.TextInputEditText
+                <com.hooni.quotesaver.util.TextInputEditTextWithClickableDrawable
                     android:id="@+id/editText_feed_search"
-                    android:layout_width="0dp"
+                    android:layout_width="match_parent"
                     android:layout_height="@dimen/editTextHeight_feed_searchField"
-                    android:layout_weight="8"
-                    android:background="@drawable/shape_edittext_rounded"
-                    android:drawableEnd="?android:attr/actionModeWebSearchDrawable"
+                    android:background="@android:color/transparent"
+                    android:drawableEnd="@drawable/ic_favorite"
                     android:hint="@string/hint_textInputEditText_feed_search"
                     android:imeOptions="actionSearch"
                     android:inputType="text"
                     android:paddingHorizontal="@dimen/horizontalPadding_feed_searchField"
                     android:text="@={feedViewModel.currentSearchTerm}"
                     tools:textColor="@color/black" />
-
-                <ImageView
-                    android:id="@+id/imageView_feed_favorites"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="center"
-                    android:layout_weight="1"
-                    android:contentDescription="@string/ContentDescription_imageButton_feed_search"
-                    android:src="@drawable/ic_favorite" />
-
-            </LinearLayout>
-
-            <androidx.recyclerview.widget.RecyclerView
-                android:id="@+id/recyclerView_feed_quoteFeed"
-                android:layout_width="match_parent"
-                android:layout_height="0dp"
-                android:paddingHorizontal="@dimen/horizontalPadding_feed_recyclerView"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/linearLayout_feed_search"
-                tools:itemCount="4"
-                tools:listitem="@layout/list_item_quote" />
-
-            <LinearLayout
-                android:id="@+id/linearLayout_feed_loading"
-                android:layout_width="match_parent"
-                android:layout_height="0dp"
-                android:background="@color/transparent_grey"
-                android:gravity="center"
-                android:visibility="gone"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/linearLayout_feed_search">
-
-                <ProgressBar
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:indeterminate="true" />
-            </LinearLayout>
-
-            <TextView
-                android:id="@+id/textView_feed_noResults"
-                android:layout_width="match_parent"
-                android:layout_height="0dp"
-                android:gravity="center"
-                android:text="@string/textView_feed_noResults"
-                android:visibility="gone"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/linearLayout_feed_search" />
+            </androidx.appcompat.widget.Toolbar>
+        </com.google.android.material.appbar.AppBarLayout>
 
 
-        </androidx.constraintlayout.widget.ConstraintLayout>
+        <LinearLayout
+            android:id="@+id/linearLayout_feed_loading"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_gravity="center"
+            android:background="@color/transparent_grey"
+            android:gravity="center"
+            android:visibility="gone">
+
+            <ProgressBar
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:indeterminate="true" />
+        </LinearLayout>
+
+        <TextView
+            android:id="@+id/textView_feed_noResults"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:gravity="center"
+            android:text="@string/textView_feed_noResults"
+            android:visibility="gone" />
+
     </androidx.coordinatorlayout.widget.CoordinatorLayout>
+
 </layout>
