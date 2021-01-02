@@ -19,7 +19,7 @@ class QuoteFeedAdapter(
 ) :
     RecyclerView.Adapter<QuoteFeedAdapter.QuoteViewHolder>() {
 
-    inner class QuoteViewHolder(private val binding: ListItemQuoteBinding) :
+    class QuoteViewHolder(private val binding: ListItemQuoteBinding) :
         RecyclerView.ViewHolder(binding.root) {
 
         fun bindView(

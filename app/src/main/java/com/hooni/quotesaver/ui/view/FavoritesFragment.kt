@@ -18,6 +18,7 @@ import com.hooni.quotesaver.databinding.FragmentFavoriteQuotesBinding
 import com.hooni.quotesaver.ui.adapter.QuoteFeedAdapter
 import com.hooni.quotesaver.ui.viewmodel.FeedViewModel
 import com.hooni.quotesaver.ui.viewmodel.FeedViewModel.Progress.*
+import com.hooni.quotesaver.util.hideKeyboard
 import org.koin.androidx.viewmodel.ext.android.sharedViewModel
 
 class FavoritesFragment: Fragment() {
@@ -55,6 +56,7 @@ class FavoritesFragment: Fragment() {
         initLoadingView()
         initNoFavoritesText()
         initRecyclerView()
+        hideKeyboard(requireContext(),binding.root)
     }
 
     private fun initBackButton() {

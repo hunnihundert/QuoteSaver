@@ -2,7 +2,6 @@
     <string name="app_name">QuoteSaver</string>
     <string name="contentDescription_imageView_listItemQuote_favorite">Add to Favorite</string>
     <string name="contentDescription_imageView_listItemQuote_share">Share</string>
-    <string name="ContentDescription_imageButton_feed_search">Search</string>
     <string name="textView_feed_noResults">No search results</string>
     <string name="textView_favorites_noFavorites">No favorites added</string>
     <string name="textView_feed_error">Error while loading: %1$s</string>
