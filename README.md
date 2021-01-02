@@ -4,14 +4,17 @@
 [![Gradle](https://badgen.net/badge/Gradle/6.5/blue)](https://gradle.org)
 [![API](https://badgen.net/badge/API/21+/green)](https://android-arsenal.com/api?level=21#l21)
 
+An app that get quotes from an API and let's the user save quotes locally.
+This app is meant for presentational purposes.
+
 Searching|Adding Favorites|Fullscreen|Sharing
 ------------ | ------------- | -------------  | -------------  
 ![Search](Readme%20Images/search.gif)|![Favorites](Readme%20Images/favorites.gif)|![Fullscreen](Readme%20Images/fullscreen.gif)|![Fullscreen](Readme%20Images/share.gif)
 
+## Download
+Clone this project and start via "downloadable" branch
 
 
-An app that get quotes from an API and let's the user save quotes locally.
-This app is meant for presentational purposes.
 
 ## Tech Stack
 - [100% Kotlin](https://kotlinlang.org/)
