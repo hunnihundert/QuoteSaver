@@ -11,6 +11,8 @@ import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.google.android.material.snackbar.Snackbar
+import com.hooni.quotesaver.R
 import com.hooni.quotesaver.data.model.Quote
 import com.hooni.quotesaver.databinding.FragmentFavoriteQuotesBinding
 import com.hooni.quotesaver.ui.adapter.QuoteFeedAdapter
@@ -99,7 +101,7 @@ class FavoritesFragment: Fragment() {
                     loadingView.visibility = View.GONE
                 }
                 is Error -> {
-                    // show error
+                    showError(progress.message?)
                     loadingView.visibility = View.GONE
                 }
                 is Loading -> {
@@ -119,5 +121,13 @@ class FavoritesFragment: Fragment() {
     private fun switchNoResultsTextVisibility(listIsEmpty: Boolean) {
         if(listIsEmpty) noFavoritesTextView.visibility = View.VISIBLE
         else noFavoritesTextView.visibility = View.GONE
+    }
+
+    private fun showError(message: String?) {
+        val errorMessage = getString(R.string.textView_feed_error, message ?: "Unknown Error")
+        noFavoritesTextView.text = errorMessage
+        noFavoritesTextView.visibility = View.VISIBLE
+        val snackBar = Snackbar.make(binding.root, errorMessage, Snackbar.LENGTH_SHORT)
+        snackBar.show()
     }
 }
