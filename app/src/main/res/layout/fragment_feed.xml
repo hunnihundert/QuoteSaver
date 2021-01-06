@@ -55,7 +55,6 @@
                     android:imeOptions="actionSearch"
                     android:inputType="text"
                     android:paddingHorizontal="@dimen/horizontalPadding_feed_searchField"
-                    android:text="@={feedViewModel.currentSearchTerm}"
                     tools:textColor="@color/black" />
             </androidx.appcompat.widget.Toolbar>
         </com.google.android.material.appbar.AppBarLayout>
