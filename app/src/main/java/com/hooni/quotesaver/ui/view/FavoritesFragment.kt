@@ -103,7 +103,7 @@ class FavoritesFragment: Fragment() {
                     loadingView.visibility = View.GONE
                 }
                 is Error -> {
-                    showError(progress.message?)
+                    showError(progress.message)
                     loadingView.visibility = View.GONE
                 }
                 is Loading -> {
