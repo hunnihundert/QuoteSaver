@@ -1,13 +1,18 @@
 package com.hooni.quotesaver.ui.view
 
+import android.content.Context
 import android.os.Bundle
+import android.util.Log
 import android.view.*
 import android.view.inputmethod.EditorInfo
 import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.activity.OnBackPressedCallback
+import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
+import androidx.paging.LoadState
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.snackbar.Snackbar
@@ -20,6 +25,12 @@ import com.hooni.quotesaver.util.DOUBLE_BACK_TAP_EXIT_INTERVAL
 import com.hooni.quotesaver.util.KEY_RECYCLERVIEW_STATE
 import com.hooni.quotesaver.util.TextInputEditTextWithClickableDrawable
 import com.hooni.quotesaver.util.hideKeyboard
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.distinctUntilChangedBy
+import kotlinx.coroutines.flow.filter
+import kotlinx.coroutines.launch
 import org.koin.androidx.viewmodel.ext.android.sharedViewModel
 
 class FeedFragment : Fragment() {
@@ -35,8 +46,9 @@ class FeedFragment : Fragment() {
     private lateinit var feedRecyclerView: RecyclerView
     private lateinit var feedAdapter: QuoteFeedAdapter
 
-    private val displayedQuotes = mutableListOf<Quote>()
     private val favoriteQuotes = mutableListOf<Quote>()
+
+    private var searchJob: Job? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -75,38 +87,17 @@ class FeedFragment : Fragment() {
         return binding.root
     }
 
-    override fun onPause() {
-        super.onPause()
-        saveRecyclerViewState()
-    }
-
-    private fun saveRecyclerViewState() {
-        feedViewModel.feedRecyclerViewState = feedRecyclerView.layoutManager?.onSaveInstanceState()
-        feedViewModel.feedRecyclerViewStateBundle = Bundle()
-        feedViewModel.feedRecyclerViewStateBundle!!.putParcelable(
-            KEY_RECYCLERVIEW_STATE,
-            feedViewModel.feedRecyclerViewState
-        )
-    }
-
-    override fun onResume() {
-        super.onResume()
-        loadRecyclerViewState()
-    }
-
-    private fun loadRecyclerViewState() {
-        feedViewModel.feedRecyclerViewStateBundle?.let {
-            feedViewModel.feedRecyclerViewState = it.getParcelable(KEY_RECYCLERVIEW_STATE)
-            feedRecyclerView.layoutManager?.onRestoreInstanceState(feedViewModel.feedRecyclerViewState)
-        }
-    }
-
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         initUi()
+        initSearch()
         initObserver()
-        loadRandomQuotes()
     }
 
+    override fun onStop() {
+        val pref = activity?.getPreferences(Context.MODE_PRIVATE)
+        pref?.edit()?.putString(SAVED_SEARCH, feedViewModel.currentSearchTerm)?.apply()
+        super.onStop()
+    }
 
     private fun initUi() {
         initSearchLayout()
@@ -120,7 +111,7 @@ class FeedFragment : Fragment() {
         searchTextInputLayout.setOnEditorActionListener { _, actionId, _ ->
             when (actionId) {
                 EditorInfo.IME_ACTION_SEARCH, EditorInfo.IME_ACTION_DONE, EditorInfo.IME_ACTION_GO, EditorInfo.IME_ACTION_SEND -> {
-                    feedViewModel.startNewRequest()
+                    updateQuotesFromInput()
                     hideKeyboard(requireContext(), binding.root)
                     true
                 }
@@ -153,44 +144,67 @@ class FeedFragment : Fragment() {
             feedViewModel.setFullscreenQuote(quote)
             findNavController().navigate(FeedFragmentDirections.actionFeedFragmentToFullscreenFragment())
         }
-        val endOfListDetector: RecyclerView.OnScrollListener =
-            object : RecyclerView.OnScrollListener() {
-                override fun onScrollStateChanged(recyclerView: RecyclerView, newState: Int) {
-                    super.onScrollStateChanged(recyclerView, newState)
-                    if (!feedRecyclerView.canScrollVertically(1) &&
-                        newState == RecyclerView.SCROLL_STATE_IDLE &&
-                        feedViewModel.progress.value != FeedViewModel.Progress.Loading
-                    ) loadNewItems()
-                }
-            }
 
         feedAdapter = QuoteFeedAdapter(
-            displayedQuotes,
             favoriteQuotes,
             favoriteStatusChanger,
             fullscreenOpener
         )
+        feedAdapter.addLoadStateListener { loadState ->
+            loadingView.isVisible = loadState.source.refresh is LoadState.Loading
+            noResultsTextView.isVisible = loadState.source.refresh is LoadState.Error
+            Log.d(TAG, "loadState: $loadState")
+            val errorState =
+                loadState.refresh as? LoadState.Error
+                    ?: loadState.source.append as? LoadState.Error
+                    ?: loadState.source.prepend as? LoadState.Error
+                    ?: loadState.append as? LoadState.Error
+                    ?: loadState.prepend as? LoadState.Error
+                    ?: loadState.refresh as? LoadState.Error
+
+            Log.d(TAG, "loadState: errorState: $errorState")
+            errorState?.let {
+                val errorMessage = getString(R.string.textView_feed_error, it.error)
+                noResultsTextView.text = errorMessage
+                noResultsTextView.visibility = View.VISIBLE
+                val snackBar = Snackbar.make(binding.root, errorMessage, Snackbar.LENGTH_SHORT)
+                snackBar.show()
+            }
+
+        }
         feedRecyclerView = binding.recyclerViewFeedQuoteFeed
         feedRecyclerView.layoutManager = LinearLayoutManager(requireContext())
         feedRecyclerView.adapter = feedAdapter
-        feedRecyclerView.addOnScrollListener(endOfListDetector)
     }
 
+    private fun initSearch() {
+        lifecycleScope.launch {
+            feedAdapter.loadStateFlow
+                .distinctUntilChangedBy { it.refresh }
+                .filter { it.refresh is LoadState.NotLoading }
+                .collectLatest { feedRecyclerView.scrollToPosition(0) }
+        }
+        getLastSearch()
+    }
+
+    private fun getLastSearch() {
+        lifecycleScope.launch {
+            if (feedViewModel.currentSearchTerm == null) {
+                val prefSearch =
+                    activity?.getPreferences(Context.MODE_PRIVATE)?.getString(SAVED_SEARCH, "")
+                feedViewModel.currentSearchTerm = prefSearch ?: ""
+                if (feedViewModel.currentSearchTerm == "") {
+                    feedViewModel.setRandomCategoryAsSearchTerm()
+                }
+            }
+            search(feedViewModel.currentSearchTerm!!)
+            searchTextInputLayout.setText(feedViewModel.currentSearchTerm!!)
+        }
+    }
 
     private fun initObserver() {
         feedViewModel.favoriteQuotes.observe(viewLifecycleOwner) { favoriteQuoteList ->
             updateFavoriteQuotes(favoriteQuoteList)
-        }
-
-        feedViewModel.quoteResultWithImages.observe(viewLifecycleOwner) { quoteResultWithImages ->
-            loadingView.visibility = View.GONE
-            if (feedViewModel.getIsNewRequest()) {
-                feedRecyclerView.scrollToPosition(0)
-                feedViewModel.resetIsNewRequest()
-            }
-            updateRecyclerView(quoteResultWithImages.results)
-            moveEditTextCursorToEnd()
-            switchNoResultsTextVisibility(quoteResultWithImages.results.isEmpty())
         }
 
         feedViewModel.progress.observe(viewLifecycleOwner) { progress ->
@@ -210,29 +224,16 @@ class FeedFragment : Fragment() {
         }
     }
 
-    private fun showError(message: String?) {
-        val errorMessage = getString(R.string.textView_feed_error, message ?: "Unknown Error")
-        noResultsTextView.text = errorMessage
+//    private fun switchNoResultsTextVisibility(listIsEmpty: Boolean) {
+//        if (listIsEmpty) {
+//            noResultsTextView.visibility = View.VISIBLE
+//            noResultsTextView.text = getString(R.string.textView_feed_noResults)
+//        } else noResultsTextView.visibility = View.GONE
+//    }
+
+    private fun showError(errorMessage: String) {
         noResultsTextView.visibility = View.VISIBLE
-        val snackBar = Snackbar.make(binding.root, errorMessage, Snackbar.LENGTH_SHORT)
-        snackBar.show()
-    }
-
-    private fun updateRecyclerView(quoteList: List<Quote>) {
-        displayedQuotes.clear()
-        displayedQuotes.addAll(quoteList)
-        feedAdapter.notifyDataSetChanged()
-    }
-
-    private fun moveEditTextCursorToEnd() {
-        searchTextInputLayout.setSelection(searchTextInputLayout.length())
-    }
-
-    private fun switchNoResultsTextVisibility(listIsEmpty: Boolean) {
-        if (listIsEmpty) {
-            noResultsTextView.visibility = View.VISIBLE
-            noResultsTextView.text = getString(R.string.textView_feed_noResults)
-        } else noResultsTextView.visibility = View.GONE
+        noResultsTextView.text = errorMessage
     }
 
     private fun updateFavoriteQuotes(favoriteQuoteList: List<Quote>) {
@@ -241,13 +242,25 @@ class FeedFragment : Fragment() {
         feedAdapter.notifyDataSetChanged()
     }
 
-
-    private fun loadRandomQuotes() {
-        if (feedViewModel.lastRequestedSearch.isEmpty()) feedViewModel.loadRandomQuotes()
+    private fun updateQuotesFromInput() {
+        searchTextInputLayout.text?.trim()?.let {
+            if (it.isNotEmpty()) search(it.toString())
+        }
     }
 
+    private fun search(query: String) {
+        searchJob?.cancel()
+        searchJob = lifecycleScope.launch {
+            feedViewModel.getQuotesByCategory(query).collectLatest {
+                feedAdapter.submitData(it)
+            }
+        }
 
-    private fun loadNewItems() {
-        feedViewModel.addNewItems()
     }
+
+    companion object {
+        private const val SAVED_SEARCH = "saved search"
+        private const val TAG = "FeedFragment"
+    }
+
 }

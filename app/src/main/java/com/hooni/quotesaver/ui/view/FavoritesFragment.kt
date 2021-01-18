@@ -15,6 +15,7 @@ import com.google.android.material.snackbar.Snackbar
 import com.hooni.quotesaver.R
 import com.hooni.quotesaver.data.model.Quote
 import com.hooni.quotesaver.databinding.FragmentFavoriteQuotesBinding
+import com.hooni.quotesaver.ui.adapter.FavoritesAdapter
 import com.hooni.quotesaver.ui.adapter.QuoteFeedAdapter
 import com.hooni.quotesaver.ui.viewmodel.FeedViewModel
 import com.hooni.quotesaver.ui.viewmodel.FeedViewModel.Progress.*
@@ -31,7 +32,7 @@ class FavoritesFragment: Fragment() {
     private lateinit var loadingView: LinearLayout
 
     private lateinit var favoriteQuotesRecyclerView: RecyclerView
-    private lateinit var favoriteQuotesAdapter: QuoteFeedAdapter
+    private lateinit var favoriteQuotesAdapter: FavoritesAdapter
 
     private val favoriteQuotes = mutableListOf<Quote>()
 
@@ -86,7 +87,7 @@ class FavoritesFragment: Fragment() {
             findNavController().navigate(FavoritesFragmentDirections.actionFavoritesFragmentToFullscreenFragment())
         }
 
-        favoriteQuotesAdapter = QuoteFeedAdapter(favoriteQuotes,favoriteQuotes,favoriteStatusChanger,fullscreenOpener)
+        favoriteQuotesAdapter = FavoritesAdapter(favoriteQuotes,favoriteStatusChanger,fullscreenOpener)
         favoriteQuotesRecyclerView = binding.recyclerViewFavoritesQuotes
         favoriteQuotesRecyclerView.layoutManager = LinearLayoutManager(requireContext())
         favoriteQuotesRecyclerView.adapter = favoriteQuotesAdapter
