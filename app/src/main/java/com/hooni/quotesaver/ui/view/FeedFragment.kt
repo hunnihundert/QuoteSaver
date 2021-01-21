@@ -211,27 +211,6 @@ class FeedFragment : Fragment() {
         feedViewModel.favoriteQuotes.observe(viewLifecycleOwner) { favoriteQuoteList ->
             updateFavoriteQuotes(favoriteQuoteList)
         }
-
-        feedViewModel.progress.observe(viewLifecycleOwner) { progress ->
-            when (progress) {
-                is FeedViewModel.Progress.Loading -> {
-                    loadingView.visibility = View.VISIBLE
-                }
-                is FeedViewModel.Progress.Error -> {
-                    loadingView.visibility = View.GONE
-                    progress.message
-                    showError(progress.message)
-                }
-                is FeedViewModel.Progress.Idle -> {
-                    loadingView.visibility = View.GONE
-                }
-            }
-        }
-    }
-
-    private fun showError(errorMessage: String) {
-        noResultsTextView.visibility = View.VISIBLE
-        noResultsTextView.text = errorMessage
     }
 
     private fun updateFavoriteQuotes(favoriteQuoteList: List<Quote>) {

@@ -11,13 +11,10 @@ import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.google.android.material.snackbar.Snackbar
-import com.hooni.quotesaver.R
 import com.hooni.quotesaver.data.model.Quote
 import com.hooni.quotesaver.databinding.FragmentFavoriteQuotesBinding
 import com.hooni.quotesaver.ui.adapter.FavoritesAdapter
 import com.hooni.quotesaver.ui.viewmodel.FeedViewModel
-import com.hooni.quotesaver.ui.viewmodel.FeedViewModel.Progress.*
 import com.hooni.quotesaver.util.hideKeyboard
 import org.koin.androidx.viewmodel.ext.android.sharedViewModel
 
@@ -97,21 +94,6 @@ class FavoritesFragment: Fragment() {
             updateFavoriteQuotes(updatedFavoriteQuotes)
             switchNoResultsTextVisibility(updatedFavoriteQuotes.isEmpty())
         }
-        feedViewModel.progress.observe(viewLifecycleOwner) { progress ->
-            when(progress) {
-                is Idle -> {
-                    loadingView.visibility = View.GONE
-                }
-                is Error -> {
-                    showError(progress.message)
-                    loadingView.visibility = View.GONE
-                }
-                is Loading -> {
-                    loadingView.visibility = View.VISIBLE
-                }
-            }
-
-        }
     }
 
     private fun updateFavoriteQuotes(updatedFavoriteQuotes: List<Quote>) {
@@ -123,13 +105,5 @@ class FavoritesFragment: Fragment() {
     private fun switchNoResultsTextVisibility(listIsEmpty: Boolean) {
         if(listIsEmpty) noFavoritesTextView.visibility = View.VISIBLE
         else noFavoritesTextView.visibility = View.GONE
-    }
-
-    private fun showError(message: String?) {
-        val errorMessage = getString(R.string.textView_feed_error, message ?: "Unknown Error")
-        noFavoritesTextView.text = errorMessage
-        noFavoritesTextView.visibility = View.VISIBLE
-        val snackBar = Snackbar.make(binding.root, errorMessage, Snackbar.LENGTH_SHORT)
-        snackBar.show()
     }
 }

@@ -1,7 +1,5 @@
 package com.hooni.quotesaver.ui.viewmodel
 
-import android.util.Log
-import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.asLiveData
 import androidx.lifecycle.viewModelScope
@@ -15,31 +13,12 @@ import com.hooni.quotesaver.util.getRandomImage
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.flow.onEach
-import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import retrofit2.HttpException
-import java.net.SocketTimeoutException
 
 class FeedViewModel(private val quoteRepository: QuoteRepository) : ViewModel() {
 
-    sealed class Progress {
-        object Idle : Progress()
-        object Loading : Progress()
-        class Error(val message: String) : Progress()
-    }
-
-    internal val progress = MutableLiveData<Progress>(Progress.Idle)
-
-    internal val favoriteQuotes = quoteRepository.getAllFavorites()
-        .onStart {
-            progress.value = Progress.Loading
-        }
-        .onEach {
-            progress.value = Progress.Idle
-        }
-        .asLiveData()
+    internal val favoriteQuotes = quoteRepository.getAllFavorites().asLiveData()
 
     var currentSearchTerm: String? = null
     private var currentSearchResult: Flow<PagingData<Quote>>? = null
@@ -47,30 +26,19 @@ class FeedViewModel(private val quoteRepository: QuoteRepository) : ViewModel() 
     private lateinit var fullScreenQuote: Quote
 
     private suspend fun getRandomCategory(): String {
-        progress.value = Progress.Loading
         var tags: ApiTagResult? = null
         withContext(Dispatchers.IO) {
             try {
                 tags = quoteRepository.getTags()
             } catch (exception: Exception) {
-                when (exception) {
-                    is HttpException -> {
-                        progress.postValue(Progress.Error(exception.message()))
-                    }
-                    is SocketTimeoutException -> {
-                        progress.postValue(Progress.Error(exception.message ?: "Socket Time Out"))
-                    }
-                    else -> {
-                        progress.postValue(Progress.Error(exception.message ?: "Unknown Error"))
-                    }
-                }
+                // exception will be handled when search begins
+                // as getting tags and searching for quotes try to access the same server
             }
         }
         return tags?.results?.random()?.name ?: ""
     }
 
     fun getQuotesByCategory(query: String): Flow<PagingData<Quote>> {
-        Log.d(TAG, "getQuotesByCategory: currentSearchResult: $currentSearchResult / currentSearch: $currentSearchTerm / query: $query")
         val lastResult = currentSearchResult
         if (query == currentSearchTerm && lastResult != null) {
             return lastResult
@@ -120,9 +88,4 @@ class FeedViewModel(private val quoteRepository: QuoteRepository) : ViewModel() 
     internal suspend fun setRandomCategoryAsSearchTerm() {
         currentSearchTerm = getRandomCategory()
     }
-
-    companion object {
-        private const val TAG = "FeedViewModel"
-    }
-
 }
