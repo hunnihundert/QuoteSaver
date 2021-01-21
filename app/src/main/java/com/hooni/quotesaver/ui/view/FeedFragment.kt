@@ -155,9 +155,14 @@ class FeedFragment : Fragment() {
         )
         feedAdapter.addLoadStateListener { loadState ->
             loadingView.isVisible = loadState.source.refresh is LoadState.Loading
-            noResultsTextView.isVisible = loadState.source.refresh is LoadState.Error
+            noResultsTextView.isVisible = loadState.source.refresh is LoadState.NotLoading
             reload.isVisible = loadState.source.refresh is LoadState.Error
             feedRecyclerView.isVisible = loadState.source.refresh !is LoadState.Error
+
+            if(feedAdapter.itemCount < 1) {
+                noResultsTextView.isVisible = true
+                noResultsTextView.text = getString(R.string.textView_feed_noResults)
+            } else noResultsTextView.isVisible = false
 
             val errorState =
                 loadState.refresh as? LoadState.Error
