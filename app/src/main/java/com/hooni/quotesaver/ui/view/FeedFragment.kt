@@ -2,9 +2,9 @@ package com.hooni.quotesaver.ui.view
 
 import android.content.Context
 import android.os.Bundle
-import android.util.Log
 import android.view.*
 import android.view.inputmethod.EditorInfo
+import android.widget.Button
 import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.activity.OnBackPressedCallback
@@ -22,10 +22,8 @@ import com.hooni.quotesaver.databinding.FragmentFeedBinding
 import com.hooni.quotesaver.ui.adapter.QuoteFeedAdapter
 import com.hooni.quotesaver.ui.viewmodel.FeedViewModel
 import com.hooni.quotesaver.util.DOUBLE_BACK_TAP_EXIT_INTERVAL
-import com.hooni.quotesaver.util.KEY_RECYCLERVIEW_STATE
 import com.hooni.quotesaver.util.TextInputEditTextWithClickableDrawable
 import com.hooni.quotesaver.util.hideKeyboard
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.distinctUntilChangedBy
@@ -43,6 +41,7 @@ class FeedFragment : Fragment() {
     private lateinit var searchTextInputLayout: TextInputEditTextWithClickableDrawable
     private lateinit var loadingView: LinearLayout
     private lateinit var noResultsTextView: TextView
+    private lateinit var reload: Button
     private lateinit var feedRecyclerView: RecyclerView
     private lateinit var feedAdapter: QuoteFeedAdapter
 
@@ -101,8 +100,7 @@ class FeedFragment : Fragment() {
 
     private fun initUi() {
         initSearchLayout()
-        initLoadingView()
-        initErrorTextView()
+        initLoadingAndErrorView()
         initRecyclerView()
     }
 
@@ -125,17 +123,22 @@ class FeedFragment : Fragment() {
         }
     }
 
-    private fun initLoadingView() {
+    private fun initLoadingAndErrorView() {
         loadingView = binding.linearLayoutFeedLoading
-        loadingView.visibility = View.GONE
-    }
-
-    private fun initErrorTextView() {
         noResultsTextView = binding.textViewFeedNoResults
+        reload = binding.buttonFeedReload
+        loadingView.visibility = View.GONE
         noResultsTextView.visibility = View.VISIBLE
+        reload.visibility = View.GONE
+
+        reload.setOnClickListener {
+            feedAdapter.retry()
+        }
     }
 
     private fun initRecyclerView() {
+        feedRecyclerView = binding.recyclerViewFeedQuoteFeed
+
         val favoriteStatusChanger: (Quote) -> Unit = { quote ->
             if (favoriteQuotes.contains(quote)) feedViewModel.removeFromFavorites(quote)
             else feedViewModel.addToFavorites(quote)
@@ -153,7 +156,9 @@ class FeedFragment : Fragment() {
         feedAdapter.addLoadStateListener { loadState ->
             loadingView.isVisible = loadState.source.refresh is LoadState.Loading
             noResultsTextView.isVisible = loadState.source.refresh is LoadState.Error
-            Log.d(TAG, "loadState: $loadState")
+            reload.isVisible = loadState.source.refresh is LoadState.Error
+            feedRecyclerView.isVisible = loadState.source.refresh !is LoadState.Error
+
             val errorState =
                 loadState.refresh as? LoadState.Error
                     ?: loadState.source.append as? LoadState.Error
@@ -162,17 +167,17 @@ class FeedFragment : Fragment() {
                     ?: loadState.prepend as? LoadState.Error
                     ?: loadState.refresh as? LoadState.Error
 
-            Log.d(TAG, "loadState: errorState: $errorState")
             errorState?.let {
                 val errorMessage = getString(R.string.textView_feed_error, it.error)
                 noResultsTextView.text = errorMessage
                 noResultsTextView.visibility = View.VISIBLE
+                reload.visibility = View.VISIBLE
                 val snackBar = Snackbar.make(binding.root, errorMessage, Snackbar.LENGTH_SHORT)
                 snackBar.show()
             }
 
         }
-        feedRecyclerView = binding.recyclerViewFeedQuoteFeed
+
         feedRecyclerView.layoutManager = LinearLayoutManager(requireContext())
         feedRecyclerView.adapter = feedAdapter
     }
@@ -223,13 +228,6 @@ class FeedFragment : Fragment() {
             }
         }
     }
-
-//    private fun switchNoResultsTextVisibility(listIsEmpty: Boolean) {
-//        if (listIsEmpty) {
-//            noResultsTextView.visibility = View.VISIBLE
-//            noResultsTextView.text = getString(R.string.textView_feed_noResults)
-//        } else noResultsTextView.visibility = View.GONE
-//    }
 
     private fun showError(errorMessage: String) {
         noResultsTextView.visibility = View.VISIBLE
