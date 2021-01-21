@@ -8,4 +8,5 @@
     <string name="contentDescription_imageView_favorites_back">Back Button</string>
     <string name="contentDescription_imageView_listItem_background">background Image</string>
     <string name="hint_textInputEditText_feed_search">Search</string>
+    <string name="button_feed_reload">reload</string>
 </resources>

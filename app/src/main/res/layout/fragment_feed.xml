@@ -59,30 +59,49 @@
             </androidx.appcompat.widget.Toolbar>
         </com.google.android.material.appbar.AppBarLayout>
 
-
         <LinearLayout
-            android:id="@+id/linearLayout_feed_loading"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:layout_gravity="center"
-            android:background="@color/transparent_grey"
-            android:gravity="center"
-            android:visibility="gone">
+            android:orientation="vertical"
+            android:gravity="center">
 
-            <ProgressBar
+            <LinearLayout
+                android:id="@+id/linearLayout_feed_loading"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_gravity="center"
+                android:background="@color/transparent_grey"
+                android:gravity="center"
+                android:orientation="vertical"
+                android:visibility="gone">
+
+                <ProgressBar
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:indeterminate="true" />
+            </LinearLayout>
+
+            <TextView
+                android:id="@+id/textView_feed_noResults"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:gravity="center"
+                android:text="@string/textView_feed_noResults"
+                android:visibility="gone" />
+
+            <Button
+                android:id="@+id/button_feed_reload"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:indeterminate="true" />
+                android:layout_gravity="center"
+                android:gravity="center"
+                android:text="@string/button_feed_reload"
+                android:visibility="gone" />
+
+
         </LinearLayout>
 
-        <TextView
-            android:id="@+id/textView_feed_noResults"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            android:gravity="center"
-            android:text="@string/textView_feed_noResults"
-            android:visibility="gone" />
 
     </androidx.coordinatorlayout.widget.CoordinatorLayout>
 
