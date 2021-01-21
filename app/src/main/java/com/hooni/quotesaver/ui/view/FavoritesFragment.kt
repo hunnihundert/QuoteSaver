@@ -16,7 +16,6 @@ import com.hooni.quotesaver.R
 import com.hooni.quotesaver.data.model.Quote
 import com.hooni.quotesaver.databinding.FragmentFavoriteQuotesBinding
 import com.hooni.quotesaver.ui.adapter.FavoritesAdapter
-import com.hooni.quotesaver.ui.adapter.QuoteFeedAdapter
 import com.hooni.quotesaver.ui.viewmodel.FeedViewModel
 import com.hooni.quotesaver.ui.viewmodel.FeedViewModel.Progress.*
 import com.hooni.quotesaver.util.hideKeyboard

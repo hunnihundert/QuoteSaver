@@ -1,17 +1,9 @@
 package com.hooni.quotesaver.ui.adapter
 
-import android.content.Intent
-import android.view.LayoutInflater
 import android.view.ViewGroup
-import android.widget.ImageView
 import androidx.paging.PagingDataAdapter
 import androidx.recyclerview.widget.DiffUtil
-import androidx.recyclerview.widget.RecyclerView
-import com.hooni.quotesaver.R
 import com.hooni.quotesaver.data.model.Quote
-import com.hooni.quotesaver.databinding.ListItemQuoteBinding
-import com.hooni.quotesaver.util.PicassoTransformationDarken
-import com.squareup.picasso.Picasso
 
 class QuoteFeedAdapter(
     private val favoriteQuotes: List<Quote>,

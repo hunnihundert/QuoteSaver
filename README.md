@@ -20,7 +20,7 @@ Clone this project and start via "downloadable" branch
 - [100% Kotlin](https://kotlinlang.org/)
 - [Koin](https://github.com/InsertKoinIO/koin) (dependency injection)
 - [Coroutines, Flows](https://developer.android.com/kotlin/coroutines) (asynchronous operations)
-- [Retrofit](https://square.github.io/retrofit/), [https://square.github.io/okhttp/](OkHttp) (REST API)
+- [Retrofit](https://square.github.io/retrofit/), [OkHttp](https://square.github.io/okhttp/) (REST API)
 - [Jetpack](https://developer.android.com/jetpack)
   - Lifecycle
   - LiveData

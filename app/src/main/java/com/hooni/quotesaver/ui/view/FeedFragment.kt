@@ -258,7 +258,6 @@ class FeedFragment : Fragment() {
 
     companion object {
         private const val SAVED_SEARCH = "saved search"
-        private const val TAG = "FeedFragment"
     }
 
 }
