@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <data>
+
+        <variable
+            name="feedViewModel"
+            type="com.hooni.quotesaver.ui.viewmodel.FeedViewModel" />
+    </data>
+
+
+    <androidx.coordinatorlayout.widget.CoordinatorLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@android:color/transparent"
+        android:orientation="vertical">
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/recyclerView_feed_quoteFeed"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:paddingHorizontal="@dimen/horizontalPadding_feed_recyclerView"
+            tools:itemCount="4"
+            tools:listitem="@layout/list_item_quote" />
+
+        <com.google.android.material.appbar.AppBarLayout
+            android:id="@+id/appBarLayout_feed"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@android:color/transparent"
+            app:elevation="0dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent">
+
+            <androidx.appcompat.widget.Toolbar
+                android:id="@+id/toolbar_feed"
+                android:layout_width="match_parent"
+                android:layout_height="?attr/actionBarSize"
+                android:layout_marginHorizontal="@dimen/marginHorizontal_feed_toolbar"
+                android:layout_marginVertical="@dimen/marginVertical_feed_toolbar"
+                android:background="@drawable/shape_edittext_rounded"
+                android:elevation="@dimen/elevation_feed_toolbar"
+                app:layout_scrollFlags="scroll|enterAlways">
+
+                <com.hooni.quotesaver.util.TextInputEditTextWithClickableDrawable
+                    android:id="@+id/editText_feed_search"
+                    android:layout_width="match_parent"
+                    android:layout_height="@dimen/editTextHeight_feed_searchField"
+                    android:background="@android:color/transparent"
+                    android:drawableEnd="@drawable/ic_favorite"
+                    android:hint="@string/hint_textInputEditText_feed_search"
+                    android:imeOptions="actionSearch"
+                    android:inputType="text"
+                    android:paddingHorizontal="@dimen/horizontalPadding_feed_searchField"
+                    tools:textColor="@color/black" />
+            </androidx.appcompat.widget.Toolbar>
+        </com.google.android.material.appbar.AppBarLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical"
+            android:gravity="center">
+
+            <LinearLayout
+                android:id="@+id/linearLayout_feed_loading"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_gravity="center"
+                android:background="@color/transparent_grey"
+                android:gravity="center"
+                android:orientation="vertical"
+                android:visibility="gone">
+
+                <ProgressBar
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:indeterminate="true" />
+            </LinearLayout>
+
+            <TextView
+                android:id="@+id/textView_feed_noResults"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:gravity="center"
+                android:text="@string/textView_feed_noResults"
+                android:visibility="gone" />
+
+            <Button
+                android:id="@+id/button_feed_reload"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:gravity="center"
+                android:text="@string/button_feed_reload"
+                android:visibility="gone" />
+
+
+        </LinearLayout>
+
+
+    </androidx.coordinatorlayout.widget.CoordinatorLayout>
+
+</layout>

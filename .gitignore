@@ -1,5 +1,10 @@
+
 # Built application files
 /*/build/
+app/debug/
+app/release/
+build/
+
 
 # Crashlytics configuations
 com_crashlytics_export_strings.xml
@@ -9,6 +14,10 @@ local.properties
 
 # Gradle generated files
 .gradle/
+build.gradle
+app/build.gradle
+gradle/
+gradle.properties
 
 # Signing files
 .signing/
@@ -25,6 +34,7 @@ local.properties
 .idea/modules.xml
 .idea/scopes/scope_settings.xml
 .idea/vcs.xml
+.idea
 *.iml
 
 # OS-specific files
@@ -35,3 +45,5 @@ local.properties
 .Trashes
 ehthumbs.db
 Thumbs.db
+
+external files
