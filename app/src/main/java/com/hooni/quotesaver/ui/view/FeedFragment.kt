@@ -60,19 +60,10 @@ class FeedFragment : Fragment() {
             })
     }
 
-    private fun exitOnDoubleBackTap() {
-        if (backPressedTime + DOUBLE_BACK_TAP_EXIT_INTERVAL >= System.currentTimeMillis()) {
-            backSnackBar.dismiss()
-            requireActivity().finishAffinity()
-        } else {
-            backPressedTime = System.currentTimeMillis()
-            backSnackBar = Snackbar.make(
-                binding.root,
-                "Press again to exit",
-                Snackbar.LENGTH_SHORT
-            )
-            backSnackBar.show()
-        }
+    override fun onStop() {
+        val pref = activity?.getPreferences(Context.MODE_PRIVATE)
+        pref?.edit()?.putString(SAVED_SEARCH, feedViewModel.currentSearchTerm)?.apply()
+        super.onStop()
     }
 
     override fun onCreateView(
@@ -90,12 +81,6 @@ class FeedFragment : Fragment() {
         initUi()
         initSearch()
         initObserver()
-    }
-
-    override fun onStop() {
-        val pref = activity?.getPreferences(Context.MODE_PRIVATE)
-        pref?.edit()?.putString(SAVED_SEARCH, feedViewModel.currentSearchTerm)?.apply()
-        super.onStop()
     }
 
     private fun initUi() {
@@ -121,6 +106,12 @@ class FeedFragment : Fragment() {
         searchTextInputLayout.setNavigationPoint {
             findNavController().navigate(FeedFragmentDirections.actionFeedFragmentToFavoritesFragment())
         }
+    }
+
+    private fun updateFavoriteQuotes(favoriteQuoteList: List<Quote>) {
+        favoriteQuotes.clear()
+        favoriteQuotes.addAll(favoriteQuoteList)
+        feedAdapter.notifyDataSetChanged()
     }
 
     private fun initLoadingAndErrorView() {
@@ -218,12 +209,6 @@ class FeedFragment : Fragment() {
         }
     }
 
-    private fun updateFavoriteQuotes(favoriteQuoteList: List<Quote>) {
-        favoriteQuotes.clear()
-        favoriteQuotes.addAll(favoriteQuoteList)
-        feedAdapter.notifyDataSetChanged()
-    }
-
     private fun updateQuotesFromInput() {
         searchTextInputLayout.text?.trim()?.let {
             if (it.isNotEmpty()) search(it.toString())
@@ -238,6 +223,21 @@ class FeedFragment : Fragment() {
             }
         }
 
+    }
+
+    private fun exitOnDoubleBackTap() {
+        if (backPressedTime + DOUBLE_BACK_TAP_EXIT_INTERVAL >= System.currentTimeMillis()) {
+            backSnackBar.dismiss()
+            requireActivity().finishAffinity()
+        } else {
+            backPressedTime = System.currentTimeMillis()
+            backSnackBar = Snackbar.make(
+                binding.root,
+                "Press again to exit",
+                Snackbar.LENGTH_SHORT
+            )
+            backSnackBar.show()
+        }
     }
 
     companion object {

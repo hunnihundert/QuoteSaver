@@ -15,14 +15,6 @@ class QuoteRepository(
     private val favoriteQuotesDao: FavoriteQuotesDao,
 ) {
 
-//    suspend fun getTags(): Resource<ApiTagResult> {
-//        return try {
-//            responseHandler.handleSuccess(quotesApi.getTags())
-//        } catch (e: Exception) {
-//            responseHandler.handleException(e)
-//        }
-//    }
-
     suspend fun getTags(): ApiTagResult {
         return quotesApi.getTags()
     }

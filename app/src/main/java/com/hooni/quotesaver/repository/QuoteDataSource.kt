@@ -1,6 +1,5 @@
 package com.hooni.quotesaver.repository
 
-import android.util.Log
 import androidx.paging.PagingSource
 import com.hooni.quotesaver.data.model.Quote
 import com.hooni.quotesaver.data.remote.QuotesApi
@@ -19,7 +18,6 @@ class QuoteDataSource(private val quoteApi: QuotesApi, private val category: Str
         return try {
             val apiResult =
                 quoteApi.getQuotesByCategory(category, NUMBER_OF_QUOTES_RETURNED_AT_ONCE, offset)
-            Log.d("tag", "load: next: ${apiResult.next} / previous: ${apiResult.previous}")
             val nextKey = getKey(apiResult.next)
             val prevKey = getKey(apiResult.previous)
             LoadResult.Page(apiResult.results, prevKey, nextKey)
