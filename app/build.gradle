@@ -5,7 +5,21 @@ plugins {
     id 'androidx.navigation.safeargs.kotlin'
 }
 
+def propsFile = rootProject.file('keystore.properties')
+def props = new Properties()
+
 android {
+    signingConfigs {
+        'Release-signing-config' {
+            if (propsFile.exists()) {
+                props.load(new FileInputStream(propsFile))
+                storeFile file(props['storeFile'])
+                storePassword props['storePassword']
+                keyAlias props['keyAlias']
+                keyPassword props['keyPassword']
+            }
+        }
+    }
     compileSdkVersion 30
     buildToolsVersion "30.0.2"
 
@@ -13,8 +27,8 @@ android {
         applicationId "com.hooni.quotesaver"
         minSdkVersion 21
         targetSdkVersion 30
-        versionCode 1
-        versionName "1.0"
+        versionCode 2
+        versionName "1.1"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
@@ -25,6 +39,7 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
             buildConfigField "String", "API_URL", "\"https://api.paperquotes.com/apiv1/\""
             buildConfigField "String", "API_URL_QUERY", "\"5de8e486a5f22042fa371d7af8a47c90cb0c2155\""
+            signingConfig signingConfigs.'Release-signing-config'
         }
         debug {
             buildConfigField "String", "API_URL", "\"https://api.paperquotes.com/apiv1/\""
@@ -79,7 +94,7 @@ dependencies {
     // OkHttp
     implementation "com.squareup.okhttp3:okhttp:$okhttp_version"
     implementation "com.squareup.okhttp3:logging-interceptor:$okhttp_version"
-    testImplementation"com.squareup.okhttp3:mockwebserver:$okhttp_version"
+    testImplementation "com.squareup.okhttp3:mockwebserver:$okhttp_version"
 
     // Coroutines
     implementation "org.jetbrains.kotlinx:kotlinx-coroutines-android:$coroutines_version"
