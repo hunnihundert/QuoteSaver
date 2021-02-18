@@ -23,6 +23,7 @@ import com.hooni.quotesaver.ui.adapter.QuoteFeedAdapter
 import com.hooni.quotesaver.ui.viewmodel.FeedViewModel
 import com.hooni.quotesaver.util.DOUBLE_BACK_TAP_EXIT_INTERVAL
 import com.hooni.quotesaver.util.TextInputEditTextWithClickableDrawable
+import com.hooni.quotesaver.util.firstTimeSearches
 import com.hooni.quotesaver.util.hideKeyboard
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.collectLatest
@@ -150,7 +151,7 @@ class FeedFragment : Fragment() {
             reload.isVisible = loadState.source.refresh is LoadState.Error
             feedRecyclerView.isVisible = loadState.source.refresh !is LoadState.Error
 
-            if(feedAdapter.itemCount < 1) {
+            if (feedAdapter.itemCount < 1) {
                 noResultsTextView.isVisible = true
                 noResultsTextView.text = getString(R.string.textView_feed_noResults)
             } else noResultsTextView.isVisible = false
@@ -211,7 +212,14 @@ class FeedFragment : Fragment() {
 
     private fun updateQuotesFromInput() {
         searchTextInputLayout.text?.trim()?.let {
-            if (it.isNotEmpty()) search(it.toString())
+            if (it.isNotEmpty()) {
+                search(it.toString())
+            } else {
+                val randomSearchTerm = firstTimeSearches.random()
+                search(randomSearchTerm)
+                searchTextInputLayout.setText(randomSearchTerm)
+                searchTextInputLayout.setSelection(randomSearchTerm.length)
+            }
         }
     }
 
