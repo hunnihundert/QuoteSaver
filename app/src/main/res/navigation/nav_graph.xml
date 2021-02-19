@@ -12,7 +12,7 @@
         tools:layout="@layout/fragment_feed">
         <action
             android:id="@+id/action_feedFragment_to_favoritesFragment"
-            app:destination="@id/FavoritesFragment"
+            app:destination="@id/favoritesFragment"
             app:enterAnim="@anim/slide_in_right"
             app:exitAnim="@anim/slide_out_left"
             app:popUpTo="@id/feedFragment"/>
@@ -23,7 +23,7 @@
             app:exitAnim="@anim/fragment_fade_exit"/>
     </fragment>
     <fragment
-        android:id="@+id/FavoritesFragment"
+        android:id="@+id/favoritesFragment"
         android:name="com.hooni.quotesaver.ui.view.FavoritesFragment"
         android:label="FavoritesFragment"
         tools:layout="@layout/fragment_favorite_quotes">
@@ -54,7 +54,7 @@
             app:launchSingleTop="true"/>
         <action
             android:id="@+id/action_fullscreenFragment_to_FavoritesFragment"
-            app:destination="@+id/FavoritesFragment"
+            app:destination="@+id/favoritesFragment"
             app:enterAnim="@anim/fragment_fade_enter"
             app:exitAnim="@anim/fragment_fade_exit"/>
     </fragment>

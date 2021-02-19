@@ -16,13 +16,13 @@ import androidx.paging.LoadState
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.snackbar.Snackbar
+import com.google.android.material.textfield.TextInputEditText
 import com.hooni.quotesaver.R
 import com.hooni.quotesaver.data.model.Quote
 import com.hooni.quotesaver.databinding.FragmentFeedBinding
 import com.hooni.quotesaver.ui.adapter.QuoteFeedAdapter
 import com.hooni.quotesaver.ui.viewmodel.FeedViewModel
 import com.hooni.quotesaver.util.DOUBLE_BACK_TAP_EXIT_INTERVAL
-import com.hooni.quotesaver.util.TextInputEditTextWithClickableDrawable
 import com.hooni.quotesaver.util.hideKeyboard
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.collectLatest
@@ -38,7 +38,7 @@ class FeedFragment : Fragment() {
     private var backPressedTime: Long = System.currentTimeMillis()
     private lateinit var backSnackBar: Snackbar
 
-    private lateinit var searchTextInputLayout: TextInputEditTextWithClickableDrawable
+    private lateinit var searchTextInputLayout: TextInputEditText
     private lateinit var loadingView: LinearLayout
     private lateinit var noResultsTextView: TextView
     private lateinit var reload: Button
@@ -102,9 +102,6 @@ class FeedFragment : Fragment() {
                     true
                 }
             }
-        }
-        searchTextInputLayout.setNavigationPoint {
-            findNavController().navigate(FeedFragmentDirections.actionFeedFragmentToFavoritesFragment())
         }
     }
 

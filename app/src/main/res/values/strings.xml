@@ -9,4 +9,6 @@
     <string name="contentDescription_imageView_listItem_background">background Image</string>
     <string name="hint_textInputEditText_feed_search">Search</string>
     <string name="button_feed_reload">reload</string>
+    <string name="title_bottomNav_feed">Search</string>
+    <string name="title_bottomNav_favorites">Favorites</string>
 </resources>
