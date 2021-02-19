@@ -24,6 +24,7 @@ import com.hooni.quotesaver.ui.adapter.QuoteFeedAdapter
 import com.hooni.quotesaver.ui.viewmodel.FeedViewModel
 import com.hooni.quotesaver.util.DOUBLE_BACK_TAP_EXIT_INTERVAL
 import com.hooni.quotesaver.util.TextInputEditTextWithClickableDrawable
+import com.hooni.quotesaver.util.firstTimeSearches
 import com.hooni.quotesaver.util.hideKeyboard
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.collectLatest
@@ -211,14 +212,16 @@ class FeedFragment : Fragment() {
                 feedAdapter.submitData(searchResults)
             }
 
-        }
-    }
-
     private fun updateQuotesFromInput() {
         searchTextInputLayout.text?.trim()?.let {
-            if (it.isNotEmpty()) feedViewModel.search(it.toString())
-        }
-    }
+            if (it.isNotEmpty()) {
+                search(it.toString())
+            } else {
+                val randomSearchTerm = firstTimeSearches.random()
+                search(randomSearchTerm)
+                searchTextInputLayout.setText(randomSearchTerm)
+                searchTextInputLayout.setSelection(randomSearchTerm.length)
+            }
 
     private fun exitOnDoubleBackTap() {
         if (backPressedTime + DOUBLE_BACK_TAP_EXIT_INTERVAL >= System.currentTimeMillis()) {

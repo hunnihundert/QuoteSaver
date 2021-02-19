@@ -7,6 +7,7 @@ import androidx.paging.map
 import com.hooni.quotesaver.data.model.ApiTagResult
 import com.hooni.quotesaver.data.model.Quote
 import com.hooni.quotesaver.repository.QuoteRepository
+import com.hooni.quotesaver.util.firstTimeSearches
 import com.hooni.quotesaver.util.getRandomImage
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
@@ -25,22 +26,7 @@ class FeedViewModel(private val quoteRepository: QuoteRepository) : ViewModel() 
 
     private lateinit var fullScreenQuote: Quote
 
-    private var searchJob: Job? = null
-
-    private suspend fun getRandomCategory(): String {
-        var tags: ApiTagResult? = null
-        withContext(Dispatchers.IO) {
-            try {
-                tags = quoteRepository.getTags()
-            } catch (exception: Exception) {
-                // exception will be handled when search begins
-                // as getting tags and searching for quotes try to access the same server
-            }
-        }
-        return tags?.results?.random()?.name ?: ""
-    }
-
-    private fun getQuotesByCategory(query: String) {
+    fun getQuotesByCategory(query: String): Flow<PagingData<Quote>> {
         val lastResult = currentSearchResult
         if (query == currentSearchTerm && lastResult != null) {
             return
@@ -94,7 +80,7 @@ class FeedViewModel(private val quoteRepository: QuoteRepository) : ViewModel() 
         return fullScreenQuote
     }
 
-    internal suspend fun setRandomCategoryAsSearchTerm() {
-        currentSearchTerm = getRandomCategory()
+    internal fun setRandomCategoryAsSearchTerm() {
+        currentSearchTerm = firstTimeSearches.random()
     }
 }
