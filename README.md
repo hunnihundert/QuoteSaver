@@ -12,7 +12,7 @@ Searching|Adding Favorites|Fullscreen|Sharing
 ![Search](Readme%20Images/search.gif)|![Favorites](Readme%20Images/favorites.gif)|![Fullscreen](Readme%20Images/fullscreen.gif)|![Fullscreen](Readme%20Images/share.gif)
 
 ## Download
-Clone this project and start via "downloadable" branch
+Clone this project and start via "master" branch to get the latest released version
 
 
 

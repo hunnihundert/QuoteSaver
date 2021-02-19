@@ -19,6 +19,7 @@ import com.google.android.material.snackbar.Snackbar
 import com.hooni.quotesaver.R
 import com.hooni.quotesaver.data.model.Quote
 import com.hooni.quotesaver.databinding.FragmentFeedBinding
+import com.hooni.quotesaver.ui.adapter.LoadStateAdapter
 import com.hooni.quotesaver.ui.adapter.QuoteFeedAdapter
 import com.hooni.quotesaver.ui.viewmodel.FeedViewModel
 import com.hooni.quotesaver.util.DOUBLE_BACK_TAP_EXIT_INTERVAL
@@ -48,7 +49,6 @@ class FeedFragment : Fragment() {
 
     private val favoriteQuotes = mutableListOf<Quote>()
 
-    private var searchJob: Job? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -146,29 +146,27 @@ class FeedFragment : Fragment() {
             fullscreenOpener
         )
         feedAdapter.addLoadStateListener { loadState ->
-            loadingView.isVisible = loadState.source.refresh is LoadState.Loading
-            noResultsTextView.isVisible = loadState.source.refresh is LoadState.NotLoading
-            reload.isVisible = loadState.source.refresh is LoadState.Error
-            feedRecyclerView.isVisible = loadState.source.refresh !is LoadState.Error
+            feedRecyclerView.isVisible = loadState.refresh is LoadState.NotLoading
+            noResultsTextView.isVisible = loadState.refresh is LoadState.NotLoading
+            loadingView.isVisible = loadState.refresh is LoadState.Loading
+            reload.isVisible = loadState.refresh is LoadState.Error
 
             if (feedAdapter.itemCount < 1) {
                 noResultsTextView.isVisible = true
                 noResultsTextView.text = getString(R.string.textView_feed_noResults)
             } else noResultsTextView.isVisible = false
 
-            val errorState =
-                loadState.refresh as? LoadState.Error
-                    ?: loadState.source.append as? LoadState.Error
-                    ?: loadState.source.prepend as? LoadState.Error
-                    ?: loadState.append as? LoadState.Error
-                    ?: loadState.prepend as? LoadState.Error
-                    ?: loadState.refresh as? LoadState.Error
+            val errorState = loadState.refresh as? LoadState.Error
+                ?: loadState.append as? LoadState.Error
+                ?: loadState.prepend as? LoadState.Error
 
             errorState?.let {
                 val errorMessage = getString(R.string.textView_feed_error, it.error)
-                noResultsTextView.text = errorMessage
-                noResultsTextView.visibility = View.VISIBLE
-                reload.visibility = View.VISIBLE
+                if (loadState.refresh is LoadState.Error) {
+                    noResultsTextView.text = errorMessage
+                    noResultsTextView.visibility = View.VISIBLE
+                    reload.visibility = View.VISIBLE
+                }
                 val snackBar = Snackbar.make(binding.root, errorMessage, Snackbar.LENGTH_SHORT)
                 snackBar.show()
             }
@@ -176,7 +174,8 @@ class FeedFragment : Fragment() {
         }
 
         feedRecyclerView.layoutManager = LinearLayoutManager(requireContext())
-        feedRecyclerView.adapter = feedAdapter
+        feedRecyclerView.adapter =
+            feedAdapter.withLoadStateFooter(LoadStateAdapter { feedAdapter.retry() })
     }
 
     private fun initSearch() {
@@ -199,7 +198,7 @@ class FeedFragment : Fragment() {
                     feedViewModel.setRandomCategoryAsSearchTerm()
                 }
             }
-            search(feedViewModel.currentSearchTerm!!)
+            feedViewModel.search(feedViewModel.currentSearchTerm!!)
             searchTextInputLayout.setText(feedViewModel.currentSearchTerm!!)
         }
     }
@@ -208,7 +207,10 @@ class FeedFragment : Fragment() {
         feedViewModel.favoriteQuotes.observe(viewLifecycleOwner) { favoriteQuoteList ->
             updateFavoriteQuotes(favoriteQuoteList)
         }
-    }
+        feedViewModel.currentSearchResult?.observe(viewLifecycleOwner) { searchResults ->
+            lifecycleScope.launch {
+                feedAdapter.submitData(searchResults)
+            }
 
     private fun updateQuotesFromInput() {
         searchTextInputLayout.text?.trim()?.let {
@@ -220,18 +222,6 @@ class FeedFragment : Fragment() {
                 searchTextInputLayout.setText(randomSearchTerm)
                 searchTextInputLayout.setSelection(randomSearchTerm.length)
             }
-        }
-    }
-
-    private fun search(query: String) {
-        searchJob?.cancel()
-        searchJob = lifecycleScope.launch {
-            feedViewModel.getQuotesByCategory(query).collectLatest {
-                feedAdapter.submitData(it)
-            }
-        }
-
-    }
 
     private fun exitOnDoubleBackTap() {
         if (backPressedTime + DOUBLE_BACK_TAP_EXIT_INTERVAL >= System.currentTimeMillis()) {
