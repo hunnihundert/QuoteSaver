@@ -25,7 +25,6 @@ import com.hooni.quotesaver.ui.adapter.QuoteFeedAdapter
 import com.hooni.quotesaver.ui.viewmodel.FeedViewModel
 import com.hooni.quotesaver.util.DOUBLE_BACK_TAP_EXIT_INTERVAL
 import com.hooni.quotesaver.util.hideKeyboard
-import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.distinctUntilChangedBy
 import kotlinx.coroutines.flow.filter
@@ -203,21 +202,18 @@ class FeedFragment : Fragment() {
         feedViewModel.favoriteQuotes.observe(viewLifecycleOwner) { favoriteQuoteList ->
             updateFavoriteQuotes(favoriteQuoteList)
         }
-        feedViewModel.currentSearchResult?.observe(viewLifecycleOwner) { searchResults ->
+        feedViewModel.currentSearchResultLiveData.observe(viewLifecycleOwner) { searchResults ->
             lifecycleScope.launch {
                 feedAdapter.submitData(searchResults)
             }
+        }
+    }
 
     private fun updateQuotesFromInput() {
         searchTextInputLayout.text?.trim()?.let {
-            if (it.isNotEmpty()) {
-                search(it.toString())
-            } else {
-                val randomSearchTerm = firstTimeSearches.random()
-                search(randomSearchTerm)
-                searchTextInputLayout.setText(randomSearchTerm)
-                searchTextInputLayout.setSelection(randomSearchTerm.length)
-            }
+            if (it.isNotEmpty()) feedViewModel.search(it.toString())
+        }
+    }
 
     private fun exitOnDoubleBackTap() {
         if (backPressedTime + DOUBLE_BACK_TAP_EXIT_INTERVAL >= System.currentTimeMillis()) {
@@ -236,6 +232,7 @@ class FeedFragment : Fragment() {
 
     companion object {
         private const val SAVED_SEARCH = "saved search"
+        private const val TAG = "FeedFragment"
     }
 
 }

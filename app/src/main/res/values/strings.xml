@@ -11,4 +11,5 @@
     <string name="button_feed_reload">reload</string>
     <string name="title_bottomNav_feed">Search</string>
     <string name="title_bottomNav_favorites">Favorites</string>
+    <string name="button_loadStateFooter_retry">Retry</string>
 </resources>
