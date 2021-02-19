@@ -45,12 +45,11 @@
                 android:elevation="@dimen/elevation_feed_toolbar"
                 app:layout_scrollFlags="scroll|enterAlways">
 
-                <com.hooni.quotesaver.util.TextInputEditTextWithClickableDrawable
+                <com.google.android.material.textfield.TextInputEditText
                     android:id="@+id/editText_feed_search"
                     android:layout_width="match_parent"
                     android:layout_height="@dimen/editTextHeight_feed_searchField"
                     android:background="@android:color/transparent"
-                    android:drawableEnd="@drawable/ic_favorite"
                     android:hint="@string/hint_textInputEditText_feed_search"
                     android:imeOptions="actionSearch"
                     android:inputType="text"

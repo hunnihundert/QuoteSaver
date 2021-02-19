@@ -51,20 +51,11 @@ class FavoritesFragment : Fragment() {
     }
 
     private fun initUi() {
-        initBackButton()
         initLoadingView()
         initNoFavoritesText()
         initRecyclerView()
         hideKeyboard(requireContext(), binding.root)
     }
-
-    private fun initBackButton() {
-        back = binding.imageViewFavoritesBack
-        back.setOnClickListener {
-            findNavController().navigate(FavoritesFragmentDirections.actionFavoritesFragmentToFeedFragment())
-        }
-    }
-
     private fun initLoadingView() {
         loadingView = binding.linearLayoutFavoritesLoading
         loadingView.visibility = View.GONE
