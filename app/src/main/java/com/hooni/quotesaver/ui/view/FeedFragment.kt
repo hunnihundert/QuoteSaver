@@ -47,7 +47,6 @@ class FeedFragment : Fragment() {
 
     private val favoriteQuotes = mutableListOf<Quote>()
 
-    private var searchJob: Job? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -198,7 +197,7 @@ class FeedFragment : Fragment() {
                     feedViewModel.setRandomCategoryAsSearchTerm()
                 }
             }
-            search(feedViewModel.currentSearchTerm!!)
+            feedViewModel.search(feedViewModel.currentSearchTerm!!)
             searchTextInputLayout.setText(feedViewModel.currentSearchTerm!!)
         }
     }
@@ -207,22 +206,18 @@ class FeedFragment : Fragment() {
         feedViewModel.favoriteQuotes.observe(viewLifecycleOwner) { favoriteQuoteList ->
             updateFavoriteQuotes(favoriteQuoteList)
         }
+        feedViewModel.currentSearchResult?.observe(viewLifecycleOwner) { searchResults ->
+            lifecycleScope.launch {
+                feedAdapter.submitData(searchResults)
+            }
+
+        }
     }
 
     private fun updateQuotesFromInput() {
         searchTextInputLayout.text?.trim()?.let {
-            if (it.isNotEmpty()) search(it.toString())
+            if (it.isNotEmpty()) feedViewModel.search(it.toString())
         }
-    }
-
-    private fun search(query: String) {
-        searchJob?.cancel()
-        searchJob = lifecycleScope.launch {
-            feedViewModel.getQuotesByCategory(query).collectLatest {
-                feedAdapter.submitData(it)
-            }
-        }
-
     }
 
     private fun exitOnDoubleBackTap() {

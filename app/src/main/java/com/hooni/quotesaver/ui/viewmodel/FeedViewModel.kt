@@ -1,8 +1,6 @@
 package com.hooni.quotesaver.ui.viewmodel
 
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.asLiveData
-import androidx.lifecycle.viewModelScope
+import androidx.lifecycle.*
 import androidx.paging.PagingData
 import androidx.paging.cachedIn
 import androidx.paging.map
@@ -11,7 +9,9 @@ import com.hooni.quotesaver.data.model.Quote
 import com.hooni.quotesaver.repository.QuoteRepository
 import com.hooni.quotesaver.util.getRandomImage
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -21,9 +21,11 @@ class FeedViewModel(private val quoteRepository: QuoteRepository) : ViewModel() 
     internal val favoriteQuotes = quoteRepository.getAllFavorites().asLiveData()
 
     var currentSearchTerm: String? = null
-    private var currentSearchResult: Flow<PagingData<Quote>>? = null
+    var currentSearchResult: LiveData<PagingData<Quote>>? = null
 
     private lateinit var fullScreenQuote: Quote
+
+    private var searchJob: Job? = null
 
     private suspend fun getRandomCategory(): String {
         var tags: ApiTagResult? = null
@@ -38,10 +40,10 @@ class FeedViewModel(private val quoteRepository: QuoteRepository) : ViewModel() 
         return tags?.results?.random()?.name ?: ""
     }
 
-    fun getQuotesByCategory(query: String): Flow<PagingData<Quote>> {
+    private fun getQuotesByCategory(query: String) {
         val lastResult = currentSearchResult
         if (query == currentSearchTerm && lastResult != null) {
-            return lastResult
+            return
         }
         currentSearchTerm = query
         val newResult = quoteRepository.getQuotesByCategory(query).map { pagingData ->
@@ -49,8 +51,7 @@ class FeedViewModel(private val quoteRepository: QuoteRepository) : ViewModel() 
                 createQuotesWithImages(it)
             }
         }.cachedIn(viewModelScope)
-        currentSearchResult = newResult
-        return newResult
+        currentSearchResult = newResult.asLiveData()
     }
 
     private fun createQuotesWithImages(quote: Quote): Quote {
@@ -63,6 +64,14 @@ class FeedViewModel(private val quoteRepository: QuoteRepository) : ViewModel() 
             getRandomImage().toString(),
             quote.language
         )
+    }
+
+
+    fun search(query: String) {
+        searchJob?.cancel()
+        searchJob = viewModelScope.launch {
+            getQuotesByCategory(query)
+        }
     }
 
     internal fun addToFavorites(quote: Quote) {
