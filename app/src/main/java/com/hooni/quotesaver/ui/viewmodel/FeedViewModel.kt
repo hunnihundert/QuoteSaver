@@ -64,7 +64,6 @@ class FeedViewModel(private val quoteRepository: QuoteRepository) : ViewModel() 
     fun search(query: String) {
         searchJob?.cancel()
         searchJob = viewModelScope.launch {
-            Log.d(TAG, "search: $query")
             getQuotesByCategory(query)
         }
     }
@@ -91,9 +90,5 @@ class FeedViewModel(private val quoteRepository: QuoteRepository) : ViewModel() 
 
     internal fun setRandomCategoryAsSearchTerm() {
         currentSearchTerm = firstTimeSearches.random()
-    }
-
-    companion object {
-        private const val TAG = "FeedViewModel"
     }
 }
