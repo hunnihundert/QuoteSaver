@@ -1,6 +1,7 @@
 package com.hooni.quotesaver.repository
 
 import androidx.paging.PagingSource
+import androidx.paging.PagingState
 import com.hooni.quotesaver.data.model.Quote
 import com.hooni.quotesaver.data.remote.QuotesApi
 import com.hooni.quotesaver.util.NUMBER_OF_QUOTES_RETURNED_AT_ONCE
@@ -31,9 +32,19 @@ class QuoteDataSource(private val quoteApi: QuotesApi, private val category: Str
     private fun getKey(url: String?): Int? {
         var key: Int? = null
         url?.let {
-            key = it.substringAfterLast("offset=").substringBeforeLast("&tags").toIntOrNull()
+            key = it.substringAfterLast(OFFSET_DELIMITER).substringBeforeLast(TAGS_DELIMITER)
+                .toIntOrNull()
         }
         return key
+    }
+
+    override fun getRefreshKey(state: PagingState<Int, Quote>): Int? {
+        return state.anchorPosition
+    }
+
+    companion object {
+        private const val OFFSET_DELIMITER = "offset="
+        private const val TAGS_DELIMITER = "&tags"
     }
 
 }

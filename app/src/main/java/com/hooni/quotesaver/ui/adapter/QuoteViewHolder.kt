@@ -50,7 +50,10 @@ class QuoteViewHolder(private val binding: ListItemQuoteBinding) :
             type = "text/plain"
         }
 
-        val shareIntent = Intent.createChooser(intentContent, "Share your Quote!")
+        val shareIntent = Intent.createChooser(
+            intentContent,
+            binding.root.context.getString(R.string.shareIntent_quoteViewHolder_title)
+        )
         binding.root.context.startActivity(shareIntent)
     }
 

@@ -2,7 +2,9 @@ package com.hooni.quotesaver.ui.view
 
 import android.content.Context
 import android.os.Bundle
-import android.view.*
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
 import android.view.inputmethod.EditorInfo
 import android.widget.Button
 import android.widget.LinearLayout
@@ -127,8 +129,11 @@ class FeedFragment : Fragment() {
         feedRecyclerView = binding.recyclerViewFeedQuoteFeed
 
         val favoriteStatusChanger: (Quote) -> Unit = { quote ->
-            if (favoriteQuotes.contains(quote)) feedViewModel.removeFromFavorites(quote)
-            else feedViewModel.addToFavorites(quote)
+            if (favoriteQuotes.contains(quote)) {
+                feedViewModel.removeFromFavorites(quote)
+            } else {
+                feedViewModel.addToFavorites(quote)
+            }
         }
         val fullscreenOpener: (Quote) -> Unit = { quote ->
             feedViewModel.setFullscreenQuote(quote)
@@ -189,12 +194,10 @@ class FeedFragment : Fragment() {
                 val prefSearch =
                     activity?.getPreferences(Context.MODE_PRIVATE)?.getString(SAVED_SEARCH, "")
                 feedViewModel.currentSearchTerm = prefSearch ?: ""
-                if (feedViewModel.currentSearchTerm == "") {
-                    feedViewModel.setRandomCategoryAsSearchTerm()
-                }
             }
+            if (feedViewModel.currentSearchTerm == "") feedViewModel.setRandomCategoryAsSearchTerm()
             feedViewModel.search(feedViewModel.currentSearchTerm!!)
-            searchTextInputLayout.setText(feedViewModel.currentSearchTerm!!)
+            searchTextInputLayout.setText(feedViewModel.currentSearchTerm)
         }
     }
 
@@ -223,7 +226,7 @@ class FeedFragment : Fragment() {
             backPressedTime = System.currentTimeMillis()
             backSnackBar = Snackbar.make(
                 binding.root,
-                "Press again to exit",
+                getString(R.string.snackBar_feed_doubleTapExit),
                 Snackbar.LENGTH_SHORT
             )
             backSnackBar.show()
@@ -232,7 +235,6 @@ class FeedFragment : Fragment() {
 
     companion object {
         private const val SAVED_SEARCH = "saved search"
-        private const val TAG = "FeedFragment"
     }
 
 }

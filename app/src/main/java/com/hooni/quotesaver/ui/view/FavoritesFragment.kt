@@ -1,11 +1,9 @@
 package com.hooni.quotesaver.ui.view
 
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.fragment.app.Fragment
@@ -18,14 +16,12 @@ import com.hooni.quotesaver.ui.adapter.FavoritesAdapter
 import com.hooni.quotesaver.ui.viewmodel.FeedViewModel
 import com.hooni.quotesaver.util.hideKeyboard
 import org.koin.androidx.viewmodel.ext.android.sharedViewModel
-import kotlin.math.log
 
 class FavoritesFragment : Fragment() {
 
     private val feedViewModel: FeedViewModel by sharedViewModel()
     private lateinit var binding: FragmentFavoriteQuotesBinding
 
-    private lateinit var back: ImageView
     private lateinit var noFavoritesTextView: TextView
     private lateinit var loadingView: LinearLayout
 
@@ -56,6 +52,7 @@ class FavoritesFragment : Fragment() {
         initRecyclerView()
         hideKeyboard(requireContext(), binding.root)
     }
+
     private fun initLoadingView() {
         loadingView = binding.linearLayoutFavoritesLoading
         loadingView.visibility = View.GONE
@@ -68,8 +65,11 @@ class FavoritesFragment : Fragment() {
 
     private fun initRecyclerView() {
         val favoriteStatusChanger: (Quote) -> Unit = { quote ->
-            if (favoriteQuotes.contains(quote)) feedViewModel.removeFromFavorites(quote)
-            else feedViewModel.addToFavorites(quote)
+            if (favoriteQuotes.contains(quote)) {
+                feedViewModel.removeFromFavorites(quote)
+            } else {
+                feedViewModel.addToFavorites(quote)
+            }
         }
         val fullscreenOpener: (Quote) -> Unit = { quote ->
             feedViewModel.setFullscreenQuote(quote)
@@ -92,7 +92,8 @@ class FavoritesFragment : Fragment() {
 
     private fun updateFavoriteQuotes(updatedFavoriteQuotes: List<Quote>) {
         if (updatedFavoriteQuotes.size < favoriteQuotes.size) {
-            val quote: Quote = favoriteQuotes.filterNot { updatedFavoriteQuotes.contains(it) }.first()
+            val quote: Quote =
+                favoriteQuotes.filterNot { updatedFavoriteQuotes.contains(it) }.first()
             val index = favoriteQuotes.indexOf(quote)
             favoriteQuotes.clear()
             favoriteQuotes.addAll(updatedFavoriteQuotes)
@@ -107,7 +108,9 @@ class FavoritesFragment : Fragment() {
     }
 
     private fun switchNoResultsTextVisibility(listIsEmpty: Boolean) {
-        if (listIsEmpty) noFavoritesTextView.visibility = View.VISIBLE
-        else noFavoritesTextView.visibility = View.GONE
+        when (listIsEmpty) {
+            true -> noFavoritesTextView.visibility = View.VISIBLE
+            false -> noFavoritesTextView.visibility = View.GONE
+        }
     }
 }

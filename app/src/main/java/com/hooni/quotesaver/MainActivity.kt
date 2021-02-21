@@ -1,16 +1,12 @@
 package com.hooni.quotesaver
 
 
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import androidx.appcompat.app.AppCompatActivity
 import androidx.navigation.NavController
-import androidx.navigation.NavHost
-import androidx.navigation.findNavController
 import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.ui.setupWithNavController
 import com.google.android.material.bottomnavigation.BottomNavigationView
-import com.hooni.quotesaver.ui.view.FavoritesFragmentDirections
-import com.hooni.quotesaver.ui.view.FeedFragmentDirections
 
 class MainActivity : AppCompatActivity() {
 
@@ -26,7 +22,8 @@ class MainActivity : AppCompatActivity() {
 
     private fun initBottomNavigation() {
         bottomNavigationView = findViewById(R.id.bottom_navigation)
-        navHostFragment = supportFragmentManager.findFragmentById(R.id.nav_host_fragment) as NavHostFragment
+        navHostFragment =
+            supportFragmentManager.findFragmentById(R.id.nav_host_fragment) as NavHostFragment
         navController = navHostFragment.navController
         bottomNavigationView.setupWithNavController(navController)
 

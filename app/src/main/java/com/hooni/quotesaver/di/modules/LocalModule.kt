@@ -7,8 +7,8 @@ import com.hooni.quotesaver.data.local.FavoriteQuotesDatabase
 import org.koin.dsl.module
 
 val localModule = module {
-    single { provideFavoriteQuotesDatabase(get())}
-    single { provideFavoritesQuotesDao(get())}
+    single { provideFavoriteQuotesDatabase(get()) }
+    single { provideFavoritesQuotesDao(get()) }
 }
 
 private fun provideFavoriteQuotesDatabase(applicationContext: Context): FavoriteQuotesDatabase {

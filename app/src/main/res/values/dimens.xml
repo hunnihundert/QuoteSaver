@@ -5,9 +5,6 @@
     <dimen name="horizontalPadding_feed_recyclerView">4dp</dimen>
     <dimen name="cardCornerRadius_listItem_cardView">12dp</dimen>
 
-    <dimen name="imageViewHeight_favorites_back">40dp</dimen>
-    <dimen name="padding_favorites">4dp</dimen>
-
     <dimen name="textSize_fullscreen_quote">28sp</dimen>
     <dimen name="padding_fullscreen">12dp</dimen>
 
