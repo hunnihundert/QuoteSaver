@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
-    <item android:id="@+id/feedFragment"
+    <item android:id="@+id/feedFragment_menu"
         android:title="@string/title_bottomNav_feed"
         android:icon="@android:drawable/ic_menu_search"/>
-    <item android:id="@+id/favoritesFragment"
+    <item android:id="@+id/favoritesFragment_menu"
         android:title="@string/title_bottomNav_favorites"
         android:icon="@drawable/ic_favorite"/>
 
