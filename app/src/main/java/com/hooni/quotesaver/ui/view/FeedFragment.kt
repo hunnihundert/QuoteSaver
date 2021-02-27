@@ -2,7 +2,9 @@ package com.hooni.quotesaver.ui.view
 
 import android.content.Context
 import android.os.Bundle
-import android.view.*
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
 import android.view.inputmethod.EditorInfo
 import android.widget.Button
 import android.widget.LinearLayout
@@ -44,6 +46,9 @@ class FeedFragment : Fragment() {
     private lateinit var reload: Button
     private lateinit var feedRecyclerView: RecyclerView
     private lateinit var feedAdapter: QuoteFeedAdapter
+    private lateinit var layoutManager: LinearLayoutManager
+
+    private var scrollPosition: Int? = null
 
     private val favoriteQuotes = mutableListOf<Quote>()
 
@@ -61,8 +66,24 @@ class FeedFragment : Fragment() {
 
     override fun onStop() {
         val pref = activity?.getPreferences(Context.MODE_PRIVATE)
-        pref?.edit()?.putString(SAVED_SEARCH, feedViewModel.currentSearchTerm)?.apply()
+        pref?.edit()?.apply {
+            putString(SAVED_SEARCH, feedViewModel.currentSearchTerm)?.apply()
+            putInt(
+                RECYCLER_VIEW_POSITION,
+                layoutManager.findFirstVisibleItemPosition()
+            ).apply()
+        }
         super.onStop()
+    }
+
+    override fun onStart() {
+        super.onStart()
+        scrollPosition =
+            activity?.getPreferences(Context.MODE_PRIVATE)?.getInt(RECYCLER_VIEW_POSITION, 0)
+        scrollPosition?.let { savedScrollPosition ->
+            feedRecyclerView.scrollToPosition(savedScrollPosition)
+            scrollPosition = null
+        }
     }
 
     override fun onCreateView(
@@ -165,12 +186,11 @@ class FeedFragment : Fragment() {
                 val snackBar = Snackbar.make(binding.root, errorMessage, Snackbar.LENGTH_SHORT)
                 snackBar.show()
             }
-
         }
-
-        feedRecyclerView.layoutManager = LinearLayoutManager(requireContext())
         feedRecyclerView.adapter =
             feedAdapter.withLoadStateFooter(LoadStateAdapter { feedAdapter.retry() })
+        layoutManager = LinearLayoutManager(requireContext())
+        feedRecyclerView.layoutManager = layoutManager
     }
 
     private fun initSearch() {
@@ -232,6 +252,7 @@ class FeedFragment : Fragment() {
 
     companion object {
         private const val SAVED_SEARCH = "saved search"
+        private const val RECYCLER_VIEW_POSITION = "Recycler View Position"
         private const val TAG = "FeedFragment"
     }
 
