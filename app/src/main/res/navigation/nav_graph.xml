@@ -15,12 +15,12 @@
             app:destination="@id/favoritesFragment"
             app:enterAnim="@anim/slide_in_right"
             app:exitAnim="@anim/slide_out_left"
-            app:popUpTo="@id/feedFragment"/>
+            app:popUpTo="@id/feedFragment" />
         <action
             android:id="@+id/action_feedFragment_to_fullscreenFragment"
             app:destination="@id/fullscreenFragment"
             app:enterAnim="@anim/fragment_fade_enter"
-            app:exitAnim="@anim/fragment_fade_exit"/>
+            app:exitAnim="@anim/fragment_fade_exit" />
     </fragment>
     <fragment
         android:id="@+id/favoritesFragment"
@@ -32,13 +32,13 @@
             app:destination="@id/feedFragment"
             app:enterAnim="@anim/slide_in_left"
             app:exitAnim="@anim/slide_out_right"
-            app:popUpTo="@id/feedFragment"
-            app:launchSingleTop="true"/>
+            app:launchSingleTop="true"
+            app:popUpTo="@id/feedFragment" />
         <action
             android:id="@+id/action_favoritesFragment_to_fullscreenFragment"
             app:destination="@id/fullscreenFragment"
             app:enterAnim="@anim/fragment_fade_enter"
-            app:exitAnim="@anim/fragment_fade_exit"/>
+            app:exitAnim="@anim/fragment_fade_exit" />
     </fragment>
     <fragment
         android:id="@+id/fullscreenFragment"
@@ -50,12 +50,12 @@
             app:destination="@+id/feedFragment"
             app:enterAnim="@anim/fragment_fade_enter"
             app:exitAnim="@anim/fragment_fade_exit"
-            app:popUpTo="@id/feedFragment"
-            app:launchSingleTop="true"/>
+            app:launchSingleTop="true"
+            app:popUpTo="@id/feedFragment" />
         <action
             android:id="@+id/action_fullscreenFragment_to_FavoritesFragment"
             app:destination="@+id/favoritesFragment"
             app:enterAnim="@anim/fragment_fade_enter"
-            app:exitAnim="@anim/fragment_fade_exit"/>
+            app:exitAnim="@anim/fragment_fade_exit" />
     </fragment>
 </navigation>

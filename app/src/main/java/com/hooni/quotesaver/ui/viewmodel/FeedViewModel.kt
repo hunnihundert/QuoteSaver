@@ -20,7 +20,7 @@ class FeedViewModel(private val quoteRepository: QuoteRepository) : ViewModel() 
     internal val favoriteQuotes = quoteRepository.getAllFavorites().asLiveData()
 
     var currentSearchTerm: String? = null
-    var currentSearchResult: Flow<PagingData<Quote>>? = null
+    private var currentSearchResult: Flow<PagingData<Quote>>? = null
     val currentSearchResultLiveData: LiveData<PagingData<Quote>>
         get() = _currentSearchResultLiveData
     private var _currentSearchResultLiveData = MutableLiveData<PagingData<Quote>>()

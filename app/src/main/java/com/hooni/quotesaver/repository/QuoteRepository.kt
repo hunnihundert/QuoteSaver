@@ -23,11 +23,11 @@ class QuoteRepository(
         return Pager(
             PagingConfig(
                 pageSize = NUMBER_OF_QUOTES_RETURNED_AT_ONCE,
-            enablePlaceholders = false),
-            pagingSourceFactory = {QuoteDataSource(quotesApi,category)}
+                enablePlaceholders = false
+            ),
+            pagingSourceFactory = { QuoteDataSource(quotesApi, category) }
         ).flow
     }
-
 
 
     fun getAllFavorites(): Flow<List<Quote>> {

@@ -7,6 +7,6 @@ import com.hooni.quotesaver.data.model.Quote
 
 @Database(entities = [Quote::class], version = 1)
 @TypeConverters(Converter::class)
-abstract class FavoriteQuotesDatabase: RoomDatabase() {
+abstract class FavoriteQuotesDatabase : RoomDatabase() {
     abstract fun getFavoriteQuotesDao(): FavoriteQuotesDao
 }

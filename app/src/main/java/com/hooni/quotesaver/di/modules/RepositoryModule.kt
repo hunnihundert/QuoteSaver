@@ -1,8 +1,8 @@
 package com.hooni.quotesaver.di.modules
 
-import com.hooni.quotesaver.repository.QuoteRepository
 import com.hooni.quotesaver.data.local.FavoriteQuotesDao
 import com.hooni.quotesaver.data.remote.QuotesApi
+import com.hooni.quotesaver.repository.QuoteRepository
 import org.koin.dsl.module
 
 val repositoryModule = module {

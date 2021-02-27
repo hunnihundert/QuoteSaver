@@ -32,7 +32,8 @@ class QuoteDataSource(private val quoteApi: QuotesApi, private val category: Str
     private fun getKey(url: String?): Int? {
         var key: Int? = null
         url?.let {
-            key = it.substringAfterLast("offset=").substringBeforeLast("&tags").toIntOrNull()
+            key = it.substringAfterLast(OFFSET_DELIMITER).substringBeforeLast(TAGS_DELIMITER)
+                .toIntOrNull()
         }
         return key
     }
@@ -40,4 +41,10 @@ class QuoteDataSource(private val quoteApi: QuotesApi, private val category: Str
     override fun getRefreshKey(state: PagingState<Int, Quote>): Int? {
         return state.anchorPosition
     }
+
+    companion object {
+        private const val OFFSET_DELIMITER = "offset="
+        private const val TAGS_DELIMITER = "&tags"
+    }
+
 }

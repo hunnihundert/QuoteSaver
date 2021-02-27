@@ -15,7 +15,7 @@ class FavoritesAdapter(
 
     override fun onBindViewHolder(holder: QuoteViewHolder, position: Int) {
         val item = favoriteQuotes[position]
-        holder.bindView(item,favoriteClickListener,favoriteQuotes,fullScreenClickListener)
+        holder.bindView(item, favoriteClickListener, favoriteQuotes, fullScreenClickListener)
     }
 
     override fun getItemCount(): Int {

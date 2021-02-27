@@ -10,8 +10,6 @@ import androidx.navigation.findNavController
 import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.ui.setupWithNavController
 import com.google.android.material.bottomnavigation.BottomNavigationView
-import com.hooni.quotesaver.ui.view.FavoritesFragmentDirections
-import com.hooni.quotesaver.ui.view.FeedFragmentDirections
 
 class MainActivity : AppCompatActivity() {
 

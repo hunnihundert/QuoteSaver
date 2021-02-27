@@ -1,13 +1,13 @@
 package com.hooni.quotesaver.util
 
-import org.junit.Assert.*
+import org.junit.Assert.assertEquals
 import org.junit.Test
 
-class HelperFunctionsKtTest{
+class HelperFunctionsKtTest {
 
     @Test
     fun `getRandomImage should return one item of backgroundImages`() {
         val result = getRandomImage()
-        assertEquals(backgroundImages.contains(result),true)
+        assertEquals(backgroundImages.contains(result), true)
     }
 }

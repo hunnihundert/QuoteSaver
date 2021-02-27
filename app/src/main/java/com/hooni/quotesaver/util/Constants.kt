@@ -73,4 +73,5 @@ val firstTimeSearches = listOf(
     "soul",
     "success",
     "trust",
-    "wonderful")
+    "wonderful"
+)
