@@ -1,6 +1,7 @@
 package com.hooni.quotesaver.repository
 
 import androidx.paging.PagingSource
+import androidx.paging.PagingState
 import com.hooni.quotesaver.data.model.Quote
 import com.hooni.quotesaver.data.remote.QuotesApi
 import com.hooni.quotesaver.util.NUMBER_OF_QUOTES_RETURNED_AT_ONCE
@@ -36,4 +37,7 @@ class QuoteDataSource(private val quoteApi: QuotesApi, private val category: Str
         return key
     }
 
+    override fun getRefreshKey(state: PagingState<Int, Quote>): Int? {
+        return state.anchorPosition
+    }
 }
