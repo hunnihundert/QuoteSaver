@@ -10,7 +10,7 @@ class QuoteFeedAdapter(
     private val favoriteClickListener: (Quote) -> Unit,
     private val fullScreenClickListener: (Quote) -> Unit
 ) :
-    PagingDataAdapter<Quote,QuoteViewHolder>(REPO_COMPARATOR) {
+    PagingDataAdapter<Quote, QuoteViewHolder>(REPO_COMPARATOR) {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): QuoteViewHolder {
         return QuoteViewHolder.create(parent)

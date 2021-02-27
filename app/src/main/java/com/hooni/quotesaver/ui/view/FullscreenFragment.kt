@@ -14,7 +14,7 @@ import com.hooni.quotesaver.util.PicassoTransformationDarken
 import com.squareup.picasso.Picasso
 import org.koin.androidx.viewmodel.ext.android.sharedViewModel
 
-class FullscreenFragment: Fragment() {
+class FullscreenFragment : Fragment() {
 
     private lateinit var binding: FragmentFullscreenBinding
     private val feedViewModel: FeedViewModel by sharedViewModel()

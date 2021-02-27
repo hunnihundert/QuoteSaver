@@ -5,11 +5,12 @@
     <string name="textView_feed_noResults">No search results</string>
     <string name="textView_favorites_noFavorites">No favorites added</string>
     <string name="textView_feed_error">Error while loading: %1$s</string>
-    <string name="contentDescription_imageView_favorites_back">Back Button</string>
     <string name="contentDescription_imageView_listItem_background">background Image</string>
-    <string name="hint_textInputEditText_feed_search">Search</string>
+    <string name="hint_textInputEditText_feed_search">Search for topics or keywords</string>
     <string name="button_feed_reload">reload</string>
     <string name="title_bottomNav_feed">Search</string>
     <string name="title_bottomNav_favorites">Favorites</string>
     <string name="button_loadStateFooter_retry">Retry</string>
+    <string name="snackBar_feed_doubleTapExit">Press again to exit</string>
+    <string name="shareIntent_quoteViewHolder_title">Share your Quote!</string>
 </resources>
