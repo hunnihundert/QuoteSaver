@@ -1,7 +1,12 @@
 package com.hooni.quotesaver.ui.adapter
 
 import android.content.Intent
+import android.graphics.drawable.Animatable2
+import android.graphics.drawable.AnimatedVectorDrawable
+import android.graphics.drawable.Drawable
+import android.os.Build
 import android.view.LayoutInflater
+import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import androidx.recyclerview.widget.RecyclerView
@@ -31,7 +36,7 @@ class QuoteViewHolder(private val binding: ListItemQuoteBinding) :
             fullScreenClickListener(quote)
         }
         setBackgroundImage(binding.imageViewListItemQuoteBackgroundImage, quote.image!!.toInt())
-        setFavoriteImage(favoriteQuotes.contains(quote))
+        initFavoriteImage(favoriteQuotes.contains(quote))
     }
 
     private fun addToFavorites(
@@ -40,7 +45,7 @@ class QuoteViewHolder(private val binding: ListItemQuoteBinding) :
         favoriteQuotes: List<Quote>
     ) {
         favoriteClickListener(quote)
-        setFavoriteImage(favoriteQuotes.contains(quote))
+        switchFavoriteImage(favoriteQuotes.contains(quote))
     }
 
     private fun shareQuote(quote: Quote) {
@@ -63,9 +68,35 @@ class QuoteViewHolder(private val binding: ListItemQuoteBinding) :
             .into(view)
     }
 
-    private fun setFavoriteImage(isFavorite: Boolean) {
-        if (isFavorite) binding.imageViewListItemQuoteFavorite.setImageResource(R.drawable.ic_favorite)
-        else binding.imageViewListItemQuoteFavorite.setImageResource(R.drawable.ic_favorite_border)
+    private fun switchFavoriteImage(isFavorite: Boolean) {
+        if (!isFavorite) {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                binding.imageViewListItemQuoteFavorite.visibility = View.GONE
+                binding.imageViewListItemQuoteFavoriteAnimation.visibility = View.VISIBLE
+                val animation =
+                    binding.imageViewListItemQuoteFavoriteAnimation.drawable as AnimatedVectorDrawable
+                animation.registerAnimationCallback(object : Animatable2.AnimationCallback() {
+                    override fun onAnimationEnd(drawable: Drawable?) {
+                        binding.imageViewListItemQuoteFavorite.setImageResource(R.drawable.ic_favorite)
+                        binding.imageViewListItemQuoteFavorite.visibility = View.VISIBLE
+                        binding.imageViewListItemQuoteFavoriteAnimation.visibility = View.GONE
+                    }
+                })
+                animation.start()
+            } else {
+                binding.imageViewListItemQuoteFavorite.setImageResource(R.drawable.ic_favorite)
+            }
+        } else {
+            binding.imageViewListItemQuoteFavorite.setImageResource(R.drawable.ic_favorite_border)
+        }
+    }
+
+    private fun initFavoriteImage(isFavorite: Boolean) {
+        if (isFavorite) {
+            binding.imageViewListItemQuoteFavorite.setImageResource(R.drawable.ic_favorite)
+        } else {
+            binding.imageViewListItemQuoteFavorite.setImageResource(R.drawable.ic_favorite_border)
+        }
     }
 
     companion object {
@@ -74,6 +105,7 @@ class QuoteViewHolder(private val binding: ListItemQuoteBinding) :
             val binding = ListItemQuoteBinding.inflate(inflater, parent, false)
             return QuoteViewHolder(binding)
         }
+        private const val TAG = "QuoteViewHolder"
     }
 
 }
