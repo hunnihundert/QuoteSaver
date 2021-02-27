@@ -25,6 +25,7 @@ class MainActivity : AppCompatActivity() {
 
     private fun initBottomNavigation() {
         bottomNavigationView = findViewById(R.id.bottom_navigation)
+
         bottomNavigationView.setOnNavigationItemSelectedListener {
             when (it.itemId) {
                 R.id.feedFragment_menu -> {
@@ -43,5 +44,16 @@ class MainActivity : AppCompatActivity() {
             }
         }
         bottomNavigationView.setOnNavigationItemReselectedListener {}
+        navHostFragment = supportFragmentManager.findFragmentById(R.id.nav_host_fragment) as NavHostFragment
+        navController = navHostFragment.navController
+        bottomNavigationView.setupWithNavController(navController)
+
+        navController.addOnDestinationChangedListener { _, destination, _ ->
+            if (destination.id == R.id.fullscreenFragment) {
+                bottomNavigationView.visibility = View.GONE
+            } else {
+                bottomNavigationView.visibility = View.VISIBLE
+            }
+        }
     }
 }
